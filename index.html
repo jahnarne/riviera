@@ -1,0 +1,1253 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#cfe89a">
+<title>Rivieraen 2026 — Reiseguide</title>
+<style>
+  :root{
+    --cream:#f7f4e9; --cream2:#fbf9f0;
+    --green:#cfe89a; --green-soft:#e6f2c6; --green-deep:#b7da78;
+    --ink:#21372a; --ink-soft:#4d6152; --line:#e4ded0;
+    --teal:#1d7874; --rust:#b5402a; --amber:#c98a16;
+    --shadow:0 10px 30px rgba(33,55,42,.10);
+    --serif:Georgia,'Times New Roman',serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--sans); background:#dce9bf; color:var(--ink); display:flex; justify-content:center; min-height:100vh}
+  #app{width:100%; max-width:460px; background:var(--cream); min-height:100vh; position:relative; overflow:hidden; box-shadow:0 0 60px rgba(0,0,0,.12)}
+  .screen{display:none; flex-direction:column; min-height:100vh; padding-bottom:80px}
+  .screen.active{display:flex}
+  h1,h2,h3{font-family:var(--serif); font-weight:700; line-height:1.15; margin:0}
+  .muted{color:var(--ink-soft)}
+  a{color:var(--teal)}
+
+  /* COVER */
+  #cover{justify-content:space-between; background:radial-gradient(120% 80% at 50% 0%, #fbf9ef 0%, #f1ecda 55%, #e7f0c9 100%)}
+  .cover-art{flex:1; display:flex; align-items:center; justify-content:center; padding:30px 24px 0}
+  .cover-art svg{width:100%; max-width:340px; height:auto}
+  .cover-copy{padding:0 28px 34px}
+  .cover-copy h1{font-size:38px; letter-spacing:-.5px}
+  .cover-copy p{font-size:15.5px; line-height:1.55; color:var(--ink-soft); margin:14px 0 22px}
+  .btn{display:block; width:100%; text-align:center; border:none; cursor:pointer; background:var(--green); color:var(--ink); font-family:var(--serif); font-size:18px; font-weight:700; padding:18px; border-radius:16px; box-shadow:var(--shadow)}
+  .btn:active{transform:translateY(1px)}
+
+  .top{display:flex; align-items:center; justify-content:space-between; padding:22px 18px 6px}
+  .top .avatar{width:42px;height:42px;border-radius:50%;background:var(--green-deep);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;color:#22351f;font-size:18px}
+  .bell{width:42px;height:42px;border-radius:50%;background:var(--cream2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+  .hello{padding:6px 18px 2px}
+  .hello h1{font-size:30px; letter-spacing:-.5px}
+  .hello p{margin:4px 0 0; color:var(--ink-soft); font-size:14px}
+
+  .search{margin:14px 18px 6px; display:flex; align-items:center; gap:10px; background:var(--cream2); border:1px solid var(--line); border-radius:14px; padding:13px 14px}
+  .search input{border:none; background:transparent; outline:none; font-size:15px; width:100%; color:var(--ink)}
+
+  .chips{display:flex; gap:9px; overflow-x:auto; padding:12px 18px 8px; scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto; border:1px solid var(--line); background:var(--cream2); color:var(--ink-soft); padding:9px 15px; border-radius:999px; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap}
+  .chip.active{background:var(--green); color:var(--ink); border-color:var(--green-deep)}
+
+  .sec-label{display:flex; align-items:baseline; justify-content:space-between; padding:14px 18px 4px}
+  .sec-label h2{font-size:20px}
+  .sec-label span{font-size:13px; color:var(--ink-soft)}
+
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; padding:8px 18px 10px}
+  .card{background:var(--cream2); border:1px solid var(--line); border-radius:18px; overflow:hidden; cursor:pointer; box-shadow:var(--shadow); display:flex; flex-direction:column}
+  .card:active{transform:translateY(1px)}
+  .card .thumb{height:104px; position:relative}
+  .card .thumb svg{width:100%;height:100%;display:block}
+  .badge{position:absolute; top:8px; left:8px; font-size:10.5px; font-weight:700; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,.92); color:var(--ink); z-index:2}
+  .card .fav{position:absolute; top:7px; right:7px; width:26px;height:26px;border-radius:50%; background:rgba(255,255,255,.9); display:flex;align-items:center;justify-content:center; font-size:14px; z-index:2}
+  .card .body{padding:10px 11px 12px}
+  .card .body h3{font-size:14.5px; line-height:1.2}
+  .card .loc{display:flex; align-items:center; gap:4px; color:var(--ink-soft); font-size:11.5px; margin-top:5px}
+  .card .meta{display:flex; align-items:center; justify-content:space-between; margin-top:8px}
+  .pill{font-size:11px; font-weight:700; padding:3px 8px; border-radius:999px}
+  .pill.ja{background:#dcefb6; color:#3b5a1e}
+  .pill.delvis{background:#fbe7bd; color:#8a5a08}
+  .pill.nei{background:#f3cabf; color:#8a2c19}
+  .price{font-family:var(--serif); font-weight:700; font-size:14px}
+  .empty{padding:40px 24px; text-align:center; color:var(--ink-soft)}
+
+  /* real photo overlay */
+  img.ph{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .45s; z-index:1}
+  img.ph.show{opacity:1}
+
+  /* DETAIL */
+  #detail{position:absolute; inset:0; background:var(--cream); z-index:30; display:none; flex-direction:column; overflow-y:auto; -webkit-overflow-scrolling:touch}
+  #detail.active{display:flex}
+  .d-hero{height:240px; position:relative}
+  .d-hero svg{width:100%;height:100%;display:block}
+  .d-back,.d-fav{position:absolute; top:18px; width:42px;height:42px;border-radius:50%; background:rgba(255,255,255,.92); border:none; display:flex;align-items:center;justify-content:center; cursor:pointer; box-shadow:var(--shadow); z-index:3}
+  .d-back{left:16px; font-size:20px}
+  .d-fav{right:16px; font-size:19px}
+  .d-sheet{background:var(--cream); border-radius:26px 26px 0 0; margin-top:-26px; position:relative; padding:22px 20px 40px; z-index:2}
+  .d-tagrow{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px}
+  .tag{font-size:11.5px; font-weight:700; padding:5px 10px; border-radius:999px; background:var(--green-soft); color:#3b5a1e}
+  .tag.fresh{background:#d7eef0; color:#155e5b}
+  .tag.warn{background:#fbe7bd; color:#8a5a08}
+  .d-title h1{font-size:25px; letter-spacing:-.3px}
+  .d-loc{display:flex; align-items:center; gap:6px; color:var(--ink-soft); font-size:13.5px; margin:8px 0 4px}
+  .d-block{margin-top:18px}
+  .d-block h3{font-family:var(--sans); font-weight:800; text-transform:uppercase; letter-spacing:.4px; color:var(--teal); margin-bottom:6px; font-size:12px}
+  .d-block p{margin:0; font-size:14.5px; line-height:1.6; color:#33433a}
+  .d-actions{display:flex; gap:10px; margin-top:22px}
+  .d-src{flex:1; display:flex; align-items:center; justify-content:center; gap:7px; text-decoration:none; background:var(--green); color:var(--ink); font-family:var(--serif); font-weight:700; font-size:15px; padding:15px 10px; border-radius:14px; box-shadow:var(--shadow)}
+  .d-src.light{background:var(--cream2); border:1px solid var(--line)}
+  .kvrow{display:flex; gap:10px; flex-wrap:wrap; margin-top:6px}
+  .kv{flex:1 1 calc(50% - 5px); background:var(--cream2); border:1px solid var(--line); border-radius:13px; padding:11px 12px}
+  .kv .k{font-size:10.5px; text-transform:uppercase; letter-spacing:.4px; color:var(--ink-soft); font-weight:700}
+  .kv .v{font-size:14px; font-weight:600; margin-top:3px}
+
+  /* cross-link rows in modules */
+  .xrow{display:flex; align-items:center; gap:11px; padding:9px; border:1px solid var(--line); border-radius:14px; background:var(--cream2); margin-top:9px; cursor:pointer}
+  .xrow:active{transform:translateY(1px)}
+  .xth{width:56px;height:56px;border-radius:11px;overflow:hidden;flex:0 0 auto;position:relative}
+  .xth svg,.xth img{width:100%;height:100%;object-fit:cover;display:block}
+  .xinfo{flex:1; min-width:0}
+  .xinfo h4{margin:0;font-size:14px;font-family:var(--sans);font-weight:700;line-height:1.25}
+  .xinfo .xsub{font-size:11.5px;color:var(--ink-soft);margin-top:3px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .xchev{color:var(--ink-soft); font-size:20px; flex:0 0 auto}
+  .mini{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px}
+  .mini.ja{background:#dcefb6;color:#3b5a1e}.mini.delvis{background:#fbe7bd;color:#8a5a08}.mini.nei{background:#f3cabf;color:#8a2c19}
+
+  .nav{position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:460px; background:var(--cream2); border-top:1px solid var(--line); display:flex; justify-content:space-around; padding:10px 6px calc(10px + env(safe-area-inset-bottom)); z-index:25}
+  .nav button{border:none; background:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; color:var(--ink-soft); font-size:9px; font-weight:600; padding:4px 3px; border-radius:12px}
+  .nav button.active{color:var(--ink)}
+  .nav button.active .ic{background:var(--green); border-radius:11px}
+  .nav .ic{width:34px;height:27px; display:flex; align-items:center; justify-content:center; font-size:15px}
+
+  /* booking checklist */
+  .chk{display:flex; gap:11px; align-items:flex-start; padding:9px 2px; font-size:13.5px; cursor:pointer; border-bottom:1px solid var(--line)}
+  .chk:last-child{border-bottom:none}
+  .chk input{margin-top:1px; width:19px; height:19px; accent-color:var(--teal); flex:0 0 auto}
+  .chk input:checked + span{color:var(--ink-soft); text-decoration:line-through}
+
+  /* tidsskjema */
+  .tl{margin-top:4px}
+  .tlrow{display:flex; gap:10px; padding:6px 0; border-bottom:1px dashed var(--line)}
+  .tlrow:last-child{border-bottom:none}
+  .tlt{flex:0 0 86px; font-weight:700; color:var(--teal); font-size:12.5px}
+  .tld{flex:1; font-size:13.5px; line-height:1.45; color:#33433a}
+  .hidden{display:none!important}
+  .footer-note{padding:18px 22px 30px; color:var(--ink-soft); font-size:12px; line-height:1.5; text-align:center}
+
+  /* family tips box */
+  .tips{background:var(--green-soft); border:1px solid var(--green-deep); border-radius:16px; padding:13px 15px; margin:12px 18px 2px}
+  .tips h3{font-size:14px; margin-bottom:7px; display:flex; align-items:center; gap:6px}
+  .tips ul{margin:0; padding:0; list-style:none}
+  .tips li{font-size:12.5px; line-height:1.5; color:#33433a; margin:5px 0; padding-left:2px}
+  .tcard{display:inline-flex; gap:5px; align-items:center; font-size:11px; font-weight:700; background:var(--cream2); border:1px solid var(--line); padding:3px 8px; border-radius:999px; margin-right:6px}
+
+  /* transport icon on module cards */
+  .tico{font-size:13px; margin-right:5px}
+
+  /* week / ukesplan view */
+  .grid.week{grid-template-columns:1fr}
+  .dayc{background:var(--cream2); border:1px solid var(--line); border-radius:16px; padding:14px 15px; box-shadow:var(--shadow)}
+  .dayhead{display:flex; align-items:center; gap:8px}
+  .dnum{font-family:var(--serif); font-weight:700; font-size:16px}
+  .ddate{color:var(--ink-soft); font-size:13px}
+  .dtag{margin-left:auto; font-size:10px; font-weight:700; background:var(--green); padding:4px 9px; border-radius:999px}
+  .dtitle{font-weight:700; margin-top:7px; font-size:14px; color:var(--ink)}
+  .dnote{margin:6px 0 0; font-size:12.5px; color:var(--ink-soft); line-height:1.5}
+  .dmods{display:flex; flex-wrap:wrap; gap:7px; margin-top:11px}
+  .dmod{font-size:12px; font-weight:600; background:var(--green-soft); border:1px solid var(--green-deep); color:#33433a; padding:6px 11px; border-radius:999px; cursor:pointer}
+  .dmod:active{transform:translateY(1px)}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <section id="cover" class="screen active">
+    <div class="cover-art" id="coverArt"></div>
+    <div class="cover-copy">
+      <h1>Utforsk Rivieraen</h1>
+      <p>Familieguiden for Cannes &amp; Côte d'Azur — 13.–20. juli 2026 (ankomst man. kveld kl. 19, avreise man. morgen kl. 10:30). Perler, ekte mat og ferdige dagsturer, alt kildebelagt og merket for 3-åringen.</p>
+      <button class="btn" onclick="go('home')">Start utforskningen</button>
+    </div>
+  </section>
+
+  <section id="home" class="screen">
+    <div class="top"><div class="avatar">JA</div><div class="bell">🔔</div></div>
+    <div class="hello"><h1>Bonjour, Riviera!</h1><p>13.–20. juli 2026 · ankomst man. kveld, avreise man. morgen · base i Cannes</p></div>
+    <div class="tips" id="tips">
+      <h3>🧭 Praktiske familieråd</h3>
+      <ul>
+        <li>🛤️ Foretrekk tog/båt der det går — mindre stress med barn enn bil og parkering.</li>
+        <li>🧺 Marché Forville som daglig base for picnic og hjemmemiddag ved bassenget.</li>
+        <li>🌡️ Hold dagene fleksible — 3-åring + julivarme styrer tempoet.</li>
+        <li>🎆 14. juli (tir) er nasjonaldag: stort fyrverkeri i Cannes — ta med piknik på Croisette.</li>
+      </ul>
+    </div>
+    <div class="search"><span>🔍</span><input id="q" placeholder="Søk steder, mat, dagsturer…" oninput="render()"></div>
+    <div class="chips" id="catChips"></div>
+    <div class="chips" id="zoneChips"></div>
+    <div class="sec-label"><h2 id="secTitle">Anbefalt</h2><span id="count"></span></div>
+    <div class="grid" id="grid"></div>
+    <div class="footer-note"><strong>Planen er fleksibel – bytt dager etter vær, energi og barnas humør.</strong><br>Ekte foto lastes fra Wikimedia når du er på nett; ellers vises stilisert illustrasjon.<br>Sjekk alltid åpningstider nær avreise. Trykk ♡ for å samle favoritter.</div>
+  </section>
+
+  <div id="detail">
+    <div class="d-hero" id="dHero"></div>
+    <div class="d-sheet" id="dSheet"></div>
+  </div>
+
+  <nav class="nav" id="nav">
+    <button data-cat="alle" class="active" onclick="navCat('alle')"><span class="ic">🏠</span>Hjem</button>
+    <button data-cat="perle" onclick="navCat('perle')"><span class="ic">📍</span>Perler</button>
+    <button data-cat="mat" onclick="navCat('mat')"><span class="ic">🍴</span>Mat</button>
+    <button data-cat="modul" onclick="navCat('modul')"><span class="ic">🗺️</span>Turer</button>
+    <button data-cat="uke" onclick="navCat('uke')"><span class="ic">📅</span>Uke</button>
+    <button data-cat="sjekk" onclick="navCat('sjekk')"><span class="ic">📋</span>Booking</button>
+    <button data-cat="fav" onclick="navCat('fav')"><span class="ic">❤️</span>Favoritt</button>
+  </nav>
+</div>
+
+<script>
+/* ---------------- DATA ---------------- */
+const ZONES = {
+  cannes:{name:"Cannes", pal:["#fdf3cf","#cfe7cf","#7cc0a6","#3f8f86","#2c6b6e"]},
+  nice:{name:"Nice", pal:["#ffeec2","#ffd9a8","#e8a96b","#bf7b53","#8f5a4a"]},
+  antibes:{name:"Antibes/Juan", pal:["#fdf0d0","#bfe3c9","#86c08e","#4f9e7e","#2f7a6e"]},
+  monaco:{name:"Monaco/Øst", pal:["#eaf4ff","#bfe0f2","#86b6d6","#5a86b0","#3a5e86"]},
+  grasse:{name:"Grasse/Bakland", pal:["#f3eafc","#e2d2f0","#b89cd6","#8f7ab0","#6f5e94"]},
+  tropez:{name:"Saint-Tropez", pal:["#fff4cf","#ffe199","#f0b85a","#d98b3a","#a8632a"]},
+  verdon:{name:"Verdon", pal:["#e6fbf4","#bdeede","#7fd9c2","#3fb89a","#2a8f7a"]},
+};
+
+const PERLER = [
+  {z:"cannes",n:"Île Sainte-Marguerite",a:"Lérins · ferge fra Quai Laubeuf",f:"bekreftet",k:"ja",
+   why:"Bilfri eukalyptus- og pinjeskog, grunne viker og Fort Royal med «Mannen med jernmasken». Det klart beste dagsutflukts-alternativet rett utenfor Cannes.",
+   tips:"Ta tidlig ferge (9–10) for skygge. Picnic fra Marché Forville. Gå mot rolige viker på sørsiden.",
+   pr:"Ferge ~15 min, hver halvtime om sommeren. Bær i bratta opp til fortet.",
+   u:"https://www.horizon-lerins.com/horaires/"},
+  {z:"cannes",n:"Île Saint-Honorat",a:"Lérins · klosterøy",f:"bekreftet",k:"delvis",
+   why:"Aktivt cistercienserkloster med vinmark, oliventrær og dyp ro. Mindre besøkt enn naboøya.",
+   tips:"Best som kort, rolig formiddag. Respektér at det er et aktivt kloster.",
+   pr:"Egen ferge (Planaria) fra Quai Laubeuf. La Tonnelle (kun lunsj) gjenåpner 2026 — bekreft.",
+   u:"https://www.cannes-ilesdelerins.com/en/billetterie/"},
+  {z:"cannes",n:"Marché Forville",a:"Cannes sentrum",f:"bekreftet",k:"ja",
+   why:"Byens ekte provençalske matmarked der restaurantene handler. Selve definisjonen av autentisk.",
+   tips:"Gå tidlig (7–10), sett sammen picnic til Lérins.",
+   pr:"Juli–august åpent alle dager 7–13. Overbygd hall.",
+   u:"https://en.cannes-france.com/what-to-do/markets-of-cannes/forville-market/"},
+  {z:"cannes",n:"Le Suquet (gamlebyen)",a:"Cannes · høyden over havna",f:"bekreftet",k:"delvis",
+   why:"Brosteinsgater, Notre-Dame-d'Espérance og panorama over bukta og Lérins.",
+   tips:"Gå opp sen ettermiddag for utsikt/solnedgang. Unngå restaurantraden øverst i rue Saint-Antoine (bildemenyer).",
+   pr:"Gratis, alltid åpent. Bratte brostein/trapper — bær 3-åringen, best tidlig eller etter kl. 18.",
+   u:"https://en.cannes-france.com/discover-visit/disctricts/the-suquet/"},
+  {z:"cannes",n:"Musée Bonnard",a:"Le Cannet · 15 min fra Cannes",f:"bekreftet",k:"delvis",
+   why:"Verdens eneste museum viet Pierre Bonnard, sjelden travelt. Sommer 2026: «L'Atelier au Mimosa».",
+   tips:"Svalt (klimaanlegg) på varme dager. Hold besøket kort med barn.",
+   pr:"Juli–aug 10–20, STENGT mandag.",
+   u:"https://www.museebonnard.fr/index.php/fr/informations-pratiques/horaires-acces-et-tarifs"},
+  {z:"cannes",n:"Musée Picasso + Vallauris",a:"Vallauris · keramikkbyen",f:"bekreftet",k:"delvis",
+   why:"Picassos 100 m²-veggmaleri i et romansk kapell, og gater fulle av ekte pottemakerverksteder.",
+   tips:"Gå utenfor hovedgata for de autentiske atelierene. Ofte stengt tirsdag.",
+   pr:"~20 min med bil fra Cannes. Fête de la Poterie er 9. august (utenfor deres uke).",
+   u:"https://musees-nationaux-alpesmaritimes.fr/picasso/picasso-vallauris"},
+  {z:"cannes",n:"Mougins",a:"Gourmet-landsby · 20 min",f:"bekreftet",k:"delvis",
+   why:"Perfekt bevart middelalderlandsby med kunstgallerier og Frankrikes tetteste konsentrasjon av topprestauranter.",
+   tips:"Kom sen ettermiddag, rusl i smau, spis tidlig på L'Amandier (ikke 2-stjerners med 3-åring).",
+   pr:"Bil enklest. Gratis parkering i utkanten, landsbyen er bilfri.",
+   u:"https://mouginstourisme.com/gastronomy-and-art-of-living/mougins-capital-of-gastronomy/?lang=en"},
+  {z:"cannes",n:"Parc de la Croix-des-Gardes",a:"Cannes vest",f:"bekreftet",k:"delvis",
+   why:"80 hektar pinjeskog med utsiktspunkter over bukta, gratis, nesten ingen turister.",
+   tips:"Velg korteste sløyfe (1,5 km), gå tidlig morgen for kjølig luft.",
+   pr:"Parkering på Avenue Jean Noailles. Bæremeis bedre enn vogn.",
+   u:"https://www.randofamille-cotedazur.fr/croix-des-gardes-cannes/"},
+  {z:"cannes",n:"14. juli – fyrverkeri i Cannes",a:"Baie de Cannes · foran Palais des Festivals",f:"bekreftet",k:"delvis",
+   why:"Nasjonaldagen åpner Cannes' internasjonale fyrverkeri-festival (Festival d'Art Pyrotechnique). Avfyres fra lektere ~400 m fra land, med musikk kringkastet langs Croisette. Gratis og spektakulært.",
+   tips:"Starter når det blir mørkt, ca. kl. 22:00 (bekreft eksakt tid på festival-pyrotechnique-cannes.com nær avreise — noen kilder oppgir 22:30/23:00). Beste plass: Croisette og de offentlige strendene for full effekt + musikk. Roligere utsikt: Le Suquet-høyden, Vieux Port, eller fra en båt i bukta. Kom 1–1,5 t før for plass; gater og parkering stenges av.",
+   pr:"Sen kveld for en 3-åring (~22:00). Plan: rolig dag + lang siesta, tidlig piknik-middag på Croisette (legg dere til rette før 21), og finn en plass med enkel barnevogn-retning hjem. Bor dere sentralt kan dere gå rett hjem etterpå; ellers kan én voksen ta 3-åringen hjem hvis det blir for sent.",
+   u:"https://www.festival-pyrotechnique-cannes.com/en/practical-info/"},
+
+  {z:"nice",n:"Vieux Nice + Cours Saleya",a:"Nice · gamlebyen",f:"bekreftet",k:"delvis",
+   why:"Hjertet av byen: okergule gater, barokke kirker, markedet og soccaboder.",
+   tips:"Kom til markedet tidlig (6–11), spis i sidegatene — ikke på selve Cours Saleya-terrassene.",
+   pr:"Marked tir–søn (mandag = loppemarked). Trangt og hett midt på dagen.",
+   u:"https://www.explorenicecotedazur.com/en/event/marche-a-la-brocante-saleya/"},
+  {z:"nice",n:"Colline du Château",a:"Nice · slottshøyden",f:"bekreftet",k:"ja",
+   why:"Byens beste utsikt over Baie des Anges, 19 ha park og en foss man kan gå bak. Gratis.",
+   tips:"Ta den GRATIS heisen ved enden av Quai des États-Unis — sparer all stigning.",
+   pr:"Park åpen 8:30–20. Med heis: flate stier, foss og skygge — topp for 3-åring.",
+   u:"https://www.nice.fr/lieux/parc-de-la-colline-du-chateau/"},
+  {z:"nice",n:"Musée Matisse (Cimiez)",a:"Nice · olivenlund",f:"bekreftet",k:"delvis",
+   why:"Rød villa i olivenlund med romerske ruiner. Sommerutstilling «Matisse in Vence» (17/6–28/9).",
+   tips:"Olivenlunden utenfor er barnegullet (plass, skygge). Kunsten er voksenfokusert.",
+   pr:"Åpent 10–18, STENGT tirsdag.",
+   u:"https://www.musee-matisse-nice.org/en/practical-information/"},
+  {z:"nice",n:"Musée Chagall",a:"Nice · Cimiez",f:"bekreftet",k:"delvis",
+   why:"Verdens største samling av Chagalls bibelsyklus, lite og fordøyelig.",
+   tips:"Kom om FORMIDDAGEN — middagsstengt 6.–31. juli (hage/butikk åpen i pausen).",
+   pr:"STENGT tirsdag.",
+   u:"https://musees-nationaux-alpesmaritimes.fr/chagall/en/practical-information"},
+  {z:"nice",n:"Parc Phoenix",a:"Nice vest · trikk linje 2",f:"bekreftet",k:"ja",
+   why:"7 ha botanisk park + dyr (flamingoer, lemurer, krokodille) og gigantisk drivhus. Den beste enkeltaktiviteten i Nice for en 3-åring.",
+   tips:"Gratis under 12 — hele familien ~11–14 €.",
+   pr:"Daglig 9:30–19:30 (apr–sept).",
+   u:"https://www.parc-phoenix.org/le-parc/infos-pratiques/"},
+
+  {z:"antibes",n:"Marché Provençal",a:"Antibes · Cours Masséna",f:"sannsynlig",k:"ja",
+   why:"Et av Rivieraens beste provençalske markeder i en overbygd hall fra 1920-tallet.",
+   tips:"Gå før kl. 10 (etter 13 byttes matselgere ut med kunsthåndverkere).",
+   pr:"Sjekk eksakte juli-tider nær avreise.",
+   u:"https://www.antibes-juanlespins.com/ma-ville/commerces-et-entreprises/occupation-du-domaine-public/halles-marches"},
+  {z:"antibes",n:"Phare + Sanctuaire de la Garoupe",a:"Cap d'Antibes",f:"bekreftet",k:"delvis",
+   why:"360° panorama fra Italia til Esterel. Fyret gjenåpnet 2024 (114 trinn), gratis kapell.",
+   tips:"Kombiner med Plage de la Garoupe. NB: kyststien Tirepoil er IKKE for 3-åring (trapper, stup).",
+   pr:"~10 min fra Garoupe-parkeringen. En 50 m-strekning av stien er stengt til 30.09.2026.",
+   u:"https://www.antibesjuanlespins.com/a-voir-a-faire/culture-et-patrimoine/le-patrimoine/la-chapelle-de-la-garoupe-2031654"},
+  {z:"antibes",n:"Plage de la Garoupe",a:"Cap d'Antibes",f:"bekreftet",k:"ja",
+   why:"En av få roligere bukter med slak bunn og livredder om sommeren — fin for en 3-åring, og med La Plage du Cap rett ved for lunsj.",
+   tips:"Kom tidlig for parkering. Kombiner med fyret + Sanctuaire de la Garoupe (10 min gange).",
+   pr:"Lite skygge — hatt/solkrem. Både offentlig del og private strandklubber.",
+   u:"https://www.antibesjuanlespins.com/en/discover/the-must-sees/the-beaches"},
+  {z:"antibes",n:"Verrerie de Biot (glassverk)",a:"Biot",f:"bekreftet",k:"ja",
+   why:"Se mestere blåse glass live fra sikret punkt. Gratis inngang til hall/galleri/butikk.",
+   tips:"Gratis omvisning man–fre 11:30/16:30. Barn fra 6 år kan ta kurs (3-åring ser på).",
+   pr:"Daglig 10–19.",
+   u:"https://www.verreriebiot.com/en/the-glass-ecomuseum/pratical-information/"},
+  {z:"antibes",n:"Jazz à Juan «Off» (gratis)",a:"Juan-les-Pins · Petite Pinède",f:"bekreftet",k:"delvis",
+   why:"Festivalen går 9.–19. juli. Hver kveld 19:15–20:15 gratis konserter med fremadstormende talenter.",
+   tips:"Tidlig kveld utendørs er overkommelig, men sent — én voksen kan ta 3-åringen hjem.",
+   pr:"Petite Pinède, ~5 min fra stasjonen.",
+   u:"https://jazzajuan.com/en/around-the-festival/"},
+  {z:"antibes",n:"Fort Carré",a:"Antibes · Port Vauban",f:"bekreftet",k:"delvis",
+   why:"Stjerneformet 1500-tallsfestning med panorama, gratis for barn under 18.",
+   tips:"Gangveien dit kan bli lang i varmen.",
+   pr:"1/7–31/8 10–18, STENGT mandag, ofte kun guidet (+33 4 92 90 52 13).",
+   u:"https://www.antibesjuanlespins.com/en/must-see-must-do/culture-and-heritage/heritage/the-fort-carre-2032216"},
+
+  {z:"monaco",n:"Monaco – Le Rocher & akvariet",a:"Monaco-Ville",f:"bekreftet",k:"ja",
+   why:"Bilfri middelalderklippe. Oceanografisk museum (basseng, hai, touch-pools) er en barnemagnet.",
+   tips:"Se vaktskiftet kl. 11:55 (~7 min, gratis). Klippen er flat/bilfri = trygt.",
+   pr:"Museum 9:30–20; voksen 22,50 €, barn 4–17 år 14 €, gratis under 4.",
+   u:"https://musee.oceano.org/en/practical-info/"},
+  {z:"monaco",n:"Èze village",a:"Èze · 400 m o.h.",f:"bekreftet",k:"delvis",
+   why:"Spektakulær «ørnerede» med Jardin Exotique og havutsikt. Rivieraens mest omtalte landsby.",
+   tips:"HØY turistfelle-risiko — kom FØR kl. 10. Etter 11 er gatene kaos.",
+   pr:"Bratte brosteinstrapper, ingen vogn (bær). Sentier Nietzsche er IKKE for 3-åring. Hage 10 €, gratis under 12.",
+   u:"https://jardinexotique-eze.fr/en/informations/"},
+  {z:"monaco",n:"Villefranche-sur-Mer",a:"Øst for Nice",f:"bekreftet",k:"ja",
+   why:"Pastellfasader, Rue Obscure (overbygd middelaldergate fra 1260, gratis) og Plage des Marinières — rolig bukt nesten uten bølger.",
+   tips:"Topp i sonen for 3-åring — slak bunn, perfekt for små.",
+   pr:"Tog fra Cannes ~50 min. Gamlebyen har korte trapper.",
+   u:"https://visitvillefranche.com/old-town/"},
+  {z:"monaco",n:"Villa Ephrussi de Rothschild",a:"Saint-Jean-Cap-Ferrat",f:"bekreftet",k:"ja",
+   why:"Rosa palass med ni temahager (fransk, spansk, japansk, eksotisk). Det musikalske fonteneshowet danser til musikk ~hvert 20. minutt — et reelt høydepunkt for barn — og villaen har egne barneaktiviteter/oppgaveark. Et av de mest barnevennlige «kultur»-stoppene på hele Rivieraen.",
+   tips:"Promenade Maurice Rouvier herfra er flat og barnevogn-vennlig. Kom ved åpning for kjøligere hager. Bekreft åpning 11. juli (motstridende kilder).",
+   pr:"Juli/aug 10–19; voksen 18 €, barn 7–18 år 12 €, gratis under 7. Restaurant Béatrice 11–17:30.",
+   u:"https://www.villa-ephrussi.com/fr/preparer-sa-visite/conditions-dacces"},
+  {z:"monaco",n:"Villa Kérylos",a:"Beaulieu-sur-Mer",f:"bekreftet",k:"delvis",
+   why:"Rekonstruert antikkgresk villa ved sjøen. Godt alternativ/tillegg til Ephrussi.",
+   tips:"TER-billett gir rabatt.",
+   pr:"Mai–aug 10–18, 13 €, gratis under 18.",
+   u:"https://www.villakerylos.fr/en/home/"},
+
+  {z:"grasse",n:"Grasse – lag din egen parfyme",a:"Grasse · parfymehovedstaden",f:"bekreftet",k:"delvis",
+   why:"Lag din egen parfyme på et profesjonelt atelier — noe du ikke kan gjøre andre steder. Fragonard gir gratis omvisning.",
+   tips:"Atelier passer ikke for 3-åring (alder 4+) — del gruppen, én voksen tar gamlebyrunde.",
+   pr:"~30–40 min med bil. Atelier MÅ bookes (Galimard/Molinard).",
+   u:"https://usines-parfum.fragonard.com/en/factories/the-historical-factory/"},
+  {z:"grasse",n:"Saint-Paul-de-Vence + Fondation Maeght",a:"Saint-Paul-de-Vence",f:"bekreftet",k:"delvis",
+   why:"Maeght er et av Europas viktigste moderne-kunstmuseer (Miró-labyrint, Giacometti-gård, skulpturhage). Nydelig gamleby.",
+   tips:"HØY turistfelle midt på dagen — gamlebyen tidlig/sent, Maeght 11–16.",
+   pr:"Maeght juli/aug 10–19, gratis under 16. Egen gratis parkering.",
+   u:"https://www.fondation-maeght.com/infos-pratiques/?lang=fr"},
+  {z:"grasse",n:"Chapelle du Rosaire (Matisse)",a:"Vence",f:"bekreftet",k:"delvis",
+   why:"Matisse' eget gesamtkunstverk — et lite, lysende rom han designet komplett. Han kalte det sitt mesterverk.",
+   tips:"Krever ro (kort besøk). STENGT søndag, mandag OG 14. juli.",
+   pr:"Sommer tirs–lør 10–11:30 og 14–17:30, gratis under 12.",
+   u:"http://chapellematisse.com/FR/horaires-visite-chapelle-et-espace-museal.php"},
+  {z:"grasse",n:"Tourrettes-sur-Loup",a:"Fiol- og håndverkslandsby",f:"bekreftet",k:"delvis",
+   why:"Frankrikes eneste fiol-produsentlandsby, levende håndverksmiljø, mindre besøkt enn Saint-Paul. Confiserie Florian er barnevennlig.",
+   tips:"Brostein, men kompakt og overkommelig.",
+   pr:"Parkering ved landsbyinngangen.",
+   u:"https://tourrettessurloup.com/"},
+  {z:"grasse",n:"Gourdon",a:"«Balkongen over Rivieraen»",f:"bekreftet",k:"delvis",
+   why:"Spektakulær klippelandsby med utsikt til havet og glassblåser-/krystallverksted.",
+   tips:"HØY turistfelle midt på dagen — kom tidlig/sent. Slottet er stengt for publikum.",
+   pr:"Bil-advarsel: smal, svingete vei opp (D3). Stup ved utsiktspunktene — hold hånd.",
+   u:"https://www.les-plus-beaux-villages-de-france.org/fr/nos-villages/gourdon/"},
+  {z:"grasse",n:"Cascades du Saut du Loup",a:"Gorges du Loup",f:"bekreftet",k:"delvis",
+   why:"Dramatisk juv med grønne basseng og fossefall — kort, frisk utsiktsstopp.",
+   tips:"Bading FORBUDT ved fossen. Stup/rekkverk — hold hånd.",
+   pr:"Åpent 10–19, 1 €/person. Bading kun nedstrøms ved Pont-du-Loup (kjølig, vannsko).",
+   u:"https://cascades-sautduloup.com/"},
+  {z:"grasse",n:"Coaraze (solur-landsbyen)",a:"Arrière-pays · ~53 min",f:"bekreftet",k:"delvis",
+   why:"«Solens landsby» på 667 m, berømt for kunstner-solur (bl.a. Cocteau). Stille og lite turistet.",
+   tips:"Bratte brosteinssmug og trapper — bæremeis, men rolig og trygt.",
+   pr:"~53 min fra Cannes + svingete oppkjøring.",
+   u:"https://www.villagesetpatrimoine.fr/coaraze/"},
+  {z:"grasse",n:"Sainte-Agnès + Fort Maginot",a:"Europas høyeste kystlandsby",f:"bekreftet",k:"delvis",
+   why:"800 m o.h. med Fort Maginot hugget inn i fjellet (underjordiske gallerier) + svimlende havutsikt.",
+   tips:"Best hvis 13-/10-åringen er hovedmålgruppe. Fort krever SMS-reservasjon 48 t før.",
+   pr:"~1 t 15–1 t 30 (i ytterkant). Fort stengt man/tirs, 7 €.",
+   u:"https://cotedazurfrance.fr/offres/visite-commentee-du-fort-maginot-de-sainte-agnes-sainte-agnes-fr-3246026/"},
+  {z:"grasse",n:"Aix-en-Provence – Cours Mirabeau",a:"Aix · ~1,5–2 t (langt)",f:"sannsynlig",k:"ja",
+   why:"Cours Mirabeau med platantrær og fontener, daglige markeder, calissons og iskrem — klassisk provençalsk by-sjarm. Flatt og barnevennlig.",
+   tips:"Langt unna (~1,5–2 t) — egner seg som halv-/heldag. Marked tir/tor/lør.",
+   pr:"Bil enklest. Parker i utkanten (P Rotonde) og gå inn til sentrum.",
+   u:"https://www.aixenprovencetourism.com/"},
+
+  {z:"tropez",n:"Saint-Tropez gamleby & La Ponche",a:"Saint-Tropez",f:"bekreftet",k:"delvis",
+   why:"Bak havnefronten ligger det ekte Saint-Tropez: La Ponche-kvarteret og Citadellet (utsikt, påfugler, plass).",
+   tips:"Tidlig formiddag eller sen ettermiddag — ikke midt på dagen.",
+   pr:"Langt: smartest med direkte båt fra Cannes (~1 t 15). Kjør aldri bil inn i juli.",
+   u:"https://www.sainttropeztourisme.com"},
+  {z:"tropez",n:"Gassin & Ramatuelle",a:"Saint-Tropez-halvøya",f:"bekreftet",k:"delvis",
+   why:"Middelalderske fjellandsbyer med panorama over bukta — rolig motvekt til kysten.",
+   tips:"Krever bil. Best tidlig/sent pga. varme.",
+   pr:"Gassin er klassifisert «Plus Beaux Villages de France».",
+   u:"https://www.les-plus-beaux-villages-de-france.org/fr/nos-villages/gassin/"},
+  {z:"tropez",n:"Port Grimaud («Lille Venezia»)",a:"Golfe de Saint-Tropez",f:"bekreftet",k:"ja",
+   why:"Lagune-by med kanaler i stedet for gater — barn synes ofte dette er morsommere enn Saint-Tropez.",
+   tips:"Guidet elbåt-tur ~20 min. Beste 3-åring-valg i sonen — flatt, vann å se på.",
+   pr:"Bateaux Verts shuttle fra Sainte-Maxime/Saint-Tropez.",
+   u:"https://www.grimaud-provence.com/inspirez-vous/la-nature-a-tout-moment/balade-bateau-port-grimaud/"},
+
+  {z:"verdon",n:"Pont du Galetas / Lac de Sainte-Croix",a:"Inngangen til canyonen",f:"bekreftet",k:"ja",
+   why:"Turkis innsjø der dere padler pedalo/kano RETT INN i canyonmunningen mellom stupbratte vegger. Det ikoniske Verdon-bildet.",
+   tips:"Kom før kl. 10 (åpner 08:30), reserver online. Pedalo med soltak er trygt og gøy for 3-åring.",
+   pr:"Base Nautique de l'Étoile. Pedalo ~40 €/2t. Langt — hele dagen går med.",
+   u:"https://base-nautique-etoile.fr/"},
+  {z:"verdon",n:"Moustiers-Sainte-Marie",a:"«Plus Beaux Villages»",f:"bekreftet",k:"delvis",
+   why:"Landsby klamret til fjellsiden med en foss gjennom sentrum og en forgylt stjerne på en 227 m kjetting over kløften. Fajanse-keramikk.",
+   tips:"De 262 trinnene opp til kapellet er for hardt i varmen — la én voksen bli i landsbykjernen.",
+   pr:"Realistisk 2–2,5 t kjøring hver vei fra Cannes.",
+   u:"https://www.moustiers.fr/"},
+  {z:"verdon",n:"Valensole-platået (lavendel)",a:"Haute-Provence",f:"sannsynlig",k:"delvis",
+   why:"Endeløse lilla rader mot Alpene. Duften, lyset — konsentrert Provence.",
+   tips:"Morgenlys (07–10) eller gylden time. Gå ALDRI inn i radene. Timing er på kanten: peak 1.–15. juli, høsting fra ~15.–20.",
+   pr:"Sjekk status uke 1–2 juli. Besøksgårder (Angelvin) holder marker til ~25. juli.",
+   u:"https://www.paysdemanosque.com/lavandes-angelvin/valensole.html"},
+];
+
+const MAT = [
+  {z:"cannes",n:"Aux Bons Enfants",a:"80 Rue Meynadier · 2 min fra Forville",f:"bekreftet",p:"€€",
+   why:"Provençalsk/niçois bistro siden 1935, råvarer fra markedet. VIKTIG: i juli kun middag (tirs–lør 18–22), og KUN KONTANT. Reserver.",
+   u:"https://aux-bons-enfants-cannes.com/?lang=en"},
+  {z:"cannes",n:"Astoux et Brun",a:"Vieux Port · 2 min fra Le Suquet",f:"bekreftet",p:"€€€",
+   why:"Klassisk skalldyrbrasserie siden 1953 — det legitime havne-unntaket, fastboende-favoritt i 70 år.",
+   u:"https://www.astouxetbrun.fr/"},
+  {z:"cannes",n:"Da Bouttau",a:"10 Rue Saint-Antoine · Le Suquet",f:"sannsynlig",p:"€€",
+   why:"Byens eldste restaurant (1860): bouillabaisse, daube, socca. Bedre rykte enn naboene i samme gate.",
+   u:"http://dabouttau.com/"},
+  {z:"cannes",n:"L'Amandier de Mougins",a:"Mougins-landsbyen",f:"sannsynlig",p:"€€",
+   why:"Avslappet provençalsk bistronomi (opprinnelig Roger Vergés sted), barnevennlig. Bedre familievalg enn 2-stjernerne.",
+   u:"https://www.thefork.fr/restaurants/mougins-c366220"},
+
+  {z:"nice",n:"Chez Pipo",a:"13 rue Bavastro · havnekvarteret",f:"bekreftet",p:"€",
+   why:"Socca-institusjonen siden 1923, socca ~3–4 €. Bekreftet åpent fra 1. juli. Kø i juli — kom tidlig.",
+   u:"https://www.chezpipo.fr/en"},
+  {z:"nice",n:"Chez René Socca",a:"2 rue Miralheti · Vieux Nice",f:"sannsynlig",p:"€",
+   why:"Rå, lokal socca-klassiker med fellesbenker, billig, ingen bildemeny.",
+   u:"https://nicesecret.co/socca-meilleures-adresses-nicoises/"},
+  {z:"nice",n:"Chez Thérésa",a:"28 rue Droite + Cours Saleya",f:"sannsynlig",p:"€",
+   why:"Pan bagnat & socca siden 1925, Cuisine Nissarde-merket, 100 år gammel vedovn. Pan bagnat ~4 €.",
+   u:"https://chez-theresa.fr/"},
+  {z:"nice",n:"BART (focaccia)",a:"31 rue de la Préfecture · Vieux Nice",f:"sannsynlig",p:"€",
+   why:"Italiensk focaccia-sandwich (mortadella, stracciatella), lokal hype 2025. ~8–12 €.",
+   u:"https://bart-focaccia.fr/"},
+  {z:"nice",n:"L'Escalinada",a:"22 rue Pairolière · Vieux Nice",f:"sannsynlig",p:"€€",
+   why:"Klassisk nissart (hjemmelaget ravioli, gnocchi, daube), Cuisine Nissarde + Gault&Millau. Lukket onsdag, reserver.",
+   u:"https://escalinada-nice.com/en/"},
+  {z:"nice",n:"Fenocchio",a:"2 place Rossetti · Vieux Nice",f:"bekreftet",p:"€",
+   why:"Gelato siden 1966, 90+ smaker. Perfekt 3-åring-belønning. Daglig ~9–24.",
+   u:"https://www.fenocchio.fr/"},
+  {z:"nice",n:"La Fougasserie",a:"Vieux Nice + Cours Saleya",f:"sannsynlig",p:"€",
+   why:"Surdeig, fougasse og pissaladière — bra frokost-/picnicstopp.",
+   u:"https://www.lafougasserie.com/"},
+
+  {z:"antibes",n:"Boulangerie Veziano",a:"2 Rue de la Pompe · Antibes",f:"bekreftet",p:"€",
+   why:"4. generasjons bakeri (1924), tourte aux blettes, Le Fooding-omtalt. Tømmes raskt.",
+   u:"https://lefooding.com/en/shops/boulangerie-veziano"},
+  {z:"antibes",n:"Le Safranier",a:"1 Place du Safranier · Antibes",f:"sannsynlig",p:"€€",
+   why:"Middelhavskjøkken, stor skyggefull terrasse på rolig torg — eksplisitt barnevennlig i ferske anmeldelser.",
+   u:"https://www.yelp.com/biz/le-safranier-antibes-2"},
+  {z:"antibes",n:"Le Brûlot",a:"3 Rue Frédéric Isnard · Antibes",f:"sannsynlig",p:"€€",
+   why:"20+ år, provençalsk mat over vedfyr, dagens fisk. Man–lør 12–22:45.",
+   u:"https://lebrulotantibes.com/en/"},
+  {z:"antibes",n:"Ti-Toques",a:"Av. Louis Gallet · Juan-les-Pins",f:"sannsynlig",p:"€€",
+   why:"Bevisst plassert bort fra promenaden — ingen lokkere. Bra før Jazz Off-konserten.",
+   u:"https://ti-toques.fr/"},
+  {z:"antibes",n:"L'Auberge du Vieux Village",a:"29 Rue Saint-Sébastien · Biot",f:"sannsynlig",p:"€",
+   why:"Crêperie/galette, råvarer fra familiegård — vinnersikkert for barn.",
+   u:"https://restaurants-de-france.fr/fr/l-auberge-du-vieux-village-biot-770116.html"},
+
+  {z:"monaco",n:"Place d'Armes-markedet (Chez Roger)",a:"Monaco · midlertidig marked 2026",f:"bekreftet",p:"€",
+   why:"Markedshallen er flyttet til Place d'Armes (renovering). Chez Roger socca ~3 €, Maison des Pâtes 7–25 €. Billigste ekte måltid i Monaco.",
+   u:"https://www.monaco-tribune.com/2025/10/le-marche-de-la-condamine-devoile-son-installation-temporaire-sur-la-place-darmes/"},
+  {z:"monaco",n:"Le Cosmo",a:"Place Amélie Pollonais · Villefranche",f:"sannsynlig",p:"€€",
+   why:"Brasserie i hjertet av gamlebyen: fersk fisk, pizza/burger med håndverksbrød. Uformell lunsj.",
+   u:"https://www.provence-alpes-cotedazur.com/"},
+  {z:"monaco",n:"Restaurant Béatrice",a:"Inne på Villa Ephrussi",f:"bekreftet",p:"€€",
+   why:"Praktisk lunsj uten å forlate villaen (priset for stedet). 11–17:30.",
+   u:"https://www.villa-ephrussi.com/"},
+
+  {z:"grasse",n:"Le Gazan",a:"Vieille Ville · Grasse",f:"bekreftet",p:"€€",
+   why:"Tradisjonell provençalsk (7-timers lammeskulder), «excellent rapport qualité-prix», anbefalt av Pudlowski.",
+   u:"https://www.gillespudlowski.com/50406/restaurants/le-gazan-ca-gaze-a-grasse"},
+  {z:"grasse",n:"Le Bistro du Peyra",a:"11 Place du Peyra · Vence",f:"bekreftet",p:"€€",
+   why:"Hjemmelaget, godt pris/kvalitet, på selve plassen i gamlebyen. ~10–12 min fra Matisse-kapellet.",
+   u:"https://restaurants-de-france.fr/fr/le-bistro-du-peyra-vence-1964793.html"},
+  {z:"grasse",n:"Sous les Pins",a:"På Fondation Maeght",f:"bekreftet",p:"€€",
+   why:"Drevet av teamet bak Michelin-stjernede Les Agitateurs — god mat i skulpturhagen.",
+   u:"https://www.fondation-maeght.com/infos-pratiques/?lang=fr"},
+  {z:"grasse",n:"Pizzeria du Saut du Loup",a:"Ved fossestedet · Gourdon",f:"bekreftet",p:"€",
+   why:"Vedfyrt pizza ved naturattraksjonen. Juni–sept, stengt mandag (ring 06 25 83 67 47).",
+   u:"https://cascades-sautduloup.com/"},
+  {z:"grasse",n:"L'École des Filles",a:"Le Bar-sur-Loup",f:"bekreftet",p:"€€",
+   why:"Høyt rangert provençalsk i en gammel jenteskole — lokalkjær landsbyperle.",
+   u:"https://www.thefork.fr/restaurants/le-bar-sur-loup-c306461"},
+
+  {z:"tropez",n:"La Tarte Tropézienne",a:"Place des Lices · Saint-Tropez",f:"bekreftet",p:"€",
+   why:"Originalen (1955). En kake-porsjon for noen få euro = «severdighet å spise». Daglig 06:30–19:30.",
+   u:"https://www.latartetropezienne.fr/en/"},
+  {z:"tropez",n:"Le Café",a:"Place des Lices · Saint-Tropez",f:"bekreftet",p:"€€",
+   why:"Livlig landsby-brasserie under platantrærne, lunsj-meny ~25 € (god verdi her), skygge og petanque.",
+   u:"https://www.lecafe.fr/en"},
+  {z:"tropez",n:"L'Auberge des Maures",a:"2 route de Tahiti · Saint-Tropez",f:"bekreftet",p:"€€€",
+   why:"Byens eldste, ekte provençalsk. Kun middag fra 18:45, reserver opptil 2 mnd før i juli.",
+   u:"https://fr.gaultmillau.com/en/restaurants/auberge-des-maures"},
+  {z:"tropez",n:"Sénéquier",a:"Quai Jean Jaurès · havna",f:"bekreftet",p:"€€€",
+   why:"Ikonisk rød terrasse siden 1930 — kun for ÉN drikk for opplevelsens skyld, ikke for å spise (turistpris).",
+   u:"https://www.senequier.com/"},
+
+  {z:"verdon",n:"Côté Jardin",a:"5 Chemin de La Maladrerie · Moustiers",f:"bekreftet",p:"€€",
+   why:"Sesongkjøkken, skyggefull hage med dalutsikt, familievennlig. Juli: stengt søndag.",
+   u:"https://www.cotejardin-moustiers.fr/index-en.html"},
+  {z:"verdon",n:"La Treille Muscate",a:"Place de l'Église · Moustiers",f:"bekreftet",p:"€€€",
+   why:"Provençalske klassikere under en ~200 år gammel platan, Michelin-omtalt. ~30–52 €, reserver i juli.",
+   u:"https://guide.michelin.com/be/fr/provence-alpes-cote-dazur/moustiers-sainte-marie/restaurant/la-treille-muscate5176"},
+  {z:"verdon",n:"Snack de l'Étoile",a:"Ved bryggen · Pont du Galetas",f:"bekreftet",p:"€",
+   why:"Paninis, is og vafler ved padlebryggen. Juli/aug 10–18:30 — praktisk mellom øktene.",
+   u:"https://base-nautique-etoile.fr/"},
+  {z:"grasse",n:"Auberge des Gorges du Loup",a:"Tourrettes-sur-Loup",f:"sannsynlig",p:"€€",
+   why:"Gammel auberge med skyggefull grønn terrasse og rustikk sal med peis — provençalsk tradisjon, ikke turistkjede.",
+   u:"https://www.auberge-gorgesduloup.com/fr"},
+  {z:"grasse",n:"Auberge du Soleil",a:"Coaraze · landsbyen",f:"sannsynlig",p:"€€",
+   why:"Sjarmerende hotell-restaurant midt i solur-landsbyen, få bord på lukket terrasse, hjemmelaget mat. Sjekk åpning/booking nær avreise.",
+   u:"https://www.justacote.com/coaraze-06390/hotel-et-autre-hebergement/auberge-du-soleil-679419.htm"},
+  {z:"tropez",n:"Lily's",a:"Port Grimaud · ved kanalen",f:"sannsynlig",p:"€€",
+   why:"Rolig kanalside-restaurant midt i Port Grimaud, tradisjonell mat av ferske lokale råvarer til rimelige priser — barnevennlig stopp mellom kanalbåt-turene.",
+   u:"https://www.lilys-restaurant.fr/"},
+  {z:"nice",n:"Chez Acchiardo",a:"38 rue Droite · Vieux Nice",f:"bekreftet",p:"€€",
+   why:"Familiedrevet niçois-institusjon siden 1927. Lokalfavoritt for estocaficada (stockfish), petits farcis og ekte provençalsk husmannskost. Kom tidlig eller reserver.",
+   u:"https://www.chezacchiardo.com/"},
+  {z:"antibes",n:"La Plage du Cap",a:"Plage de la Garoupe · Cap d'Antibes",f:"bekreftet",p:"€€€",
+   why:"Avslappet «barefoot» strandrestaurant ved vannet — grillet fisk, salater og sjømat. Barna kan leke i nærheten etter måltidet.",
+   u:"https://www.laplageducap.com/"},
+  {z:"monaco",n:"Capitaine Cook",a:"Saint-Jean-Cap-Ferrat · nær havnen",f:"sannsynlig",p:"€€",
+   why:"Familievennlig, tradisjonell sjømatrestaurant nær havnen — godt og uten Cap-Ferrat-prissjokk etter besøk på Villa Ephrussi.",
+   u:"https://www.capitainecook.fr/"},
+  {z:"cannes",n:"La Differnnce",a:"Île Sainte-Marguerite · nær bryggen",f:"bekreftet",p:"€€",
+   why:"Familievennlig middelhavsrestaurant på selve øya, nær fergebryggen — hyggelig alternativ til picnic på Lérins-dagen. Forretter ~11–15 €, hovedretter ~26–28 €. Åpent året rundt.",
+   u:"https://en.cannes-france.com/discover-visit/lerins-islands/where-to-eat/"},
+  {z:"cannes",n:"Côté Jardin by Steve Moracchini",a:"12 av. Saint-Louis · Cannes",f:"bekreftet",p:"€€",
+   why:"Markedsdrevet middelhavsmat litt utenfor allfarvei, varmt og uformelt. Topp pris/kvalitet (lunsj 27–35 €), Gault&Millau-omtalt, kjøkken med stjernebakgrunn (#20 av 652 i Cannes).",
+   u:"https://fr.gaultmillau.com/en/restaurants/cote-jardin-restaurant-06400"},
+  {z:"antibes",n:"Le Vauban",a:"7 bis rue Thuret · Antibes gamleby",f:"bekreftet",p:"€€€",
+   why:"Moderne, sesongbasert fransk i Michelin-guiden — for en «voksen» middag. Lunsjmeny 41 € (3 retter). Reserver. Mindre egnet for en utålmodig 3-åring.",
+   u:"https://www.levauban.fr/en/"},
+  {z:"antibes",n:"Bistrot Margaux",a:"Port Vauban · Antibes",f:"bekreftet",p:"€€",
+   why:"Terroir-bistro bak steinarkadene ved havna, lokale råvarer og tradisjon. Hverdagslunsj ~15,50 €, plat du jour 12,50 €. Familievennlig (PMR, aircondition).",
+   u:"https://www.antibesjuanlespins.com/en/must-see-must-do/going-out/restaurants/bistrot-margaux-2031975"},
+  {z:"monaco",n:"Les Garçons",a:"18 rue du Poilu · Villefranche-sur-Mer",f:"bekreftet",p:"€€",
+   why:"Kreativ markedsmat med fersk dagens fisk, koselig treterrasse i gamlebyen (#3 av 70). NB: kun middag, stengt tirsdag.",
+   u:"https://www.explorenicecotedazur.com/en/restaurant/les-garcons/"},
+  {z:"monaco",n:"La Grignotière",a:"3 rue du Poilu · Villefranche-sur-Mer",f:"bekreftet",p:"€€",
+   why:"Varm, tradisjonell familierestaurant i gamlebyen — provençalsk/italiensk, pizza, store porsjoner og god verdi (menyer fra 17 €). Snill vert.",
+   u:"https://www.la-grignotiere-restaurant-villefranche-sur-mer.com/"},
+  {z:"tropez",n:"La Ponche",a:"5 rue des Remparts · La Ponche-kvarteret, Saint-Tropez",f:"bekreftet",p:"€€€",
+   why:"Middelhavsmat i det rolige, historiske La Ponche-kvarteret (gammel fiskerbistro, nå 5-stjerners hotell) — borte fra havnefronten. Dyrt, men sjarmerende. Reserver.",
+   u:"https://laponche.com/restaurant-bar"},
+  {z:"cannes",n:"Da Laura",a:"8 rue du 24 Août · Cannes",f:"bekreftet",p:"€€",
+   why:"Italiensk trattoria siden 1992, hjemmelaget pasta og importerte råvarer, med egen delikatessebutikk ved siden av. Fargerik, hjemmekoselig — lokalfavoritt i 20+ år.",
+   u:"https://en.cannes-france.com/offers/da-laura-cannes-en-3605956/"},
+  {z:"cannes",n:"Poissonnerie Forville",a:"6 rue du Dr P. Gazagnaire · ved Marché Forville",f:"bekreftet",p:"€€",
+   why:"Sjømat- og østersbar rett ved markedet — ultraferskt, østers åpnet på stedet, rimelig. Locals spiser på terrassen. Ingen booking, ofte kø — verdt ventetiden.",
+   u:"https://www.facebook.com/poissonnerieforville/"},
+  {z:"cannes",n:"Nivà Gelateria",a:"75 rue Félix Faure · Cannes",f:"bekreftet",p:"€",
+   why:"Håndlaget italiensk gelato med alpemelk og Piemonte-hasselnøtt — intense, naturlige smaker uten tilsetninger (også vegansk). Barnefavoritt.",
+   u:"https://www.nivagelato.com/fr/"},
+  {z:"cannes",n:"La Tonnelle",a:"Île Saint-Honorat · klosterøya",f:"sannsynlig",p:"€€",
+   why:"Klosterøyas eneste restaurant — enkel, rolig middelhavsmat med øyas egne viner/oliven. Gjenåpner våren 2026, kun lunsj. Reserver.",
+   u:"https://tonnelle-abbayedelerins.fr/en/"},
+  {z:"cannes",n:"Le Jardin",a:"Le Suquet-området · Cannes",f:"sannsynlig",p:"€€",
+   why:"Koselig bistro med provençalske klassikere i en frodig hage-terrasse — «hemmelig hage»-følelse. Bekreft adresse/hvilket «Le Jardin» nær avreise (forveksles med Le Jardin Secret).",
+   u:"https://cannes-actus.com/sorties/restaurants/cannes-on-a-teste-le-restaurant-le-jardin-un-cadre-verdoyant-et-des-plats-gourmands/"},
+  {z:"antibes",n:"La Petite Escale",a:"30 rue Fourmillière · Antibes gamleby",f:"bekreftet",p:"€€",
+   why:"Liten skjult bistro drevet av paret Vincent & Hanna, ~20 couverts, daglig skiftende meny av ferske råvarer. Intim «hemmelig» følelse — reserver.",
+   u:"https://restaurants-de-france.fr/fr/la-petite-escale-antibes-1990120.html"},
+  {z:"cannes",n:"Jean-Luc Pelé",a:"36 rue Meynadier · Cannes",f:"bekreftet",p:"€€",
+   why:"Anerkjent artisan-konditor og sjokolatier — elegante macarons med originale smaker, finbakst og signaturen «pain aux baies de goji». Lettere, moderne kaker. Barnefavoritt for søtt.",
+   u:"https://jeanluc-pele.com/"},
+  {z:"cannes",n:"Itinéraire Café",a:"Cannes · gågate",f:"bekreftet",p:"€",
+   why:"Specialty coffee-torrefaktør og tesalong med ~30 kaffevarianter og hyggelig terrasse (Gault&Millau). For en ordentlig kaffepause utenom kjedene.",
+   u:"https://fr.gaultmillau.com/en/artisans/itineraire-cafe"},
+  {z:"nice",n:"Les Délices de Mathias",a:"Nice · surdeigsbakeri",f:"bekreftet",p:"€",
+   why:"Håndverksbakeri med lokale meltyper, naturlig surdeig og lange hevetider — steinmalt fullkornsbrød med natt-heving, silkemyk krumme og lett malt-smak. Perfekt for picnic.",
+   u:"https://www.delicesdemathias.fr/boulangerie"},
+  {z:"nice",n:"Boulangerie La Niçoise",a:"Nice · artisan",f:"bekreftet",p:"€",
+   why:"Prestisjebakeri (mester Pierre Bordonnat): label rouge-mel, naturlig surdeig, rene smørbakverk — finalist for Frankrikes beste vanilje-flan i 2025. Spesial-godbit.",
+   u:"https://boulangerie-lanicoise.com/"},
+  {z:"antibes",n:"La Torref de Fersen",a:"25 rue de Fersen · Antibes",f:"bekreftet",p:"€",
+   why:"Lite torrefaksjons-verksted og coffee shop i Antibes — flat white, cortado, Chemex. For kaffeentusiaster og en rolig frokost utenom turistrekka.",
+   u:"https://www.facebook.com/latorrefdefersen/"},
+  {z:"antibes",n:"Amarena",a:"18 rue Thuret · Antibes (nær Gravette)",f:"bekreftet",p:"€",
+   why:"🍦 Antibes' gelato-institusjon i 20+ år — laget daglig i eget laboratorium med siciliansk pistasj, Piemonte-hasselnøtt og Madagascar-vanilje. Mange kaller den byens beste.",
+   u:"https://glacier-antibes-amarena.fr/"},
+  {z:"antibes",n:"Papilla",a:"18 av. Dr Dautheville · Juan-les-Pins",f:"bekreftet",p:"€",
+   why:"🍦 Juan-les-Pins' beste issjappe ifølge lokale — håndlaget gelato, sprø kjeks og stort smaksutvalg. Perfekt før Jazz Off.",
+   u:"https://restaurants-de-france.fr/fr/papilla-artisan-glacier-antibes-juan-les-pins-2116023.html"},
+  {z:"monaco",n:"Glacier Feracci",a:"2 rue du Poilu · Villefranche-sur-Mer",f:"bekreftet",p:"€",
+   why:"🍦 Artisan-glacier siden 2007 i gamlebyen — egne glace/sorbet av utvalgte råvarer, regnet blant Rivieraens beste. Topp stopp etter Villefranche-bad.",
+   u:"https://cotedazurfrance.com/offers/artisan-glacier-feracci-villefranche-sur-mer-en-2972498/"},
+  {z:"grasse",n:"Glacier de la Fontaine",a:"Place de la Grande Fontaine · Saint-Paul-de-Vence",f:"bekreftet",p:"€",
+   why:"🍦 Midt i middelalderlandsbyen ved den store fontenen — 30 smaker håndlaget gelato fra maître glacier Marc Zamolo. Forfriskende pause i Saint-Paul.",
+   u:"http://www.glacierdelafontaine.fr/"},
+  {z:"tropez",n:"Barbarac",a:"Saint-Tropez · ved havna",f:"bekreftet",p:"€",
+   why:"🍦 Saint-Tropez' ikoniske issjappe siden 1988 («barbarac» = is på armensk). Laget om natten for ferskhet, kjendis-magnet, også veganske varianter. Byens beste.",
+   u:"https://barbarac.fr/"},
+  {z:"monaco",n:"L'Atelier du Glacier",a:"La Condamine · Monaco",f:"bekreftet",p:"€",
+   why:"🍦 Familiedrevet «Made in Monaco»-glacier siden 2009, laget på stedet daglig — bl.a. en fougassette-inspirert smak (appelsinblomst, anis, mandel) i Monacos farger. Nær markedet.",
+   u:"https://www.monacomatin.mc/conso-shopping/ou-manger-des-glaces-artisanales-a-monaco-notre-selection-784101"},
+  {z:"grasse",n:"Les Glaces d'Andrea",a:"Grasse (triporteur, også Cannes/Nice)",f:"sannsynlig",p:"€",
+   why:"🍦 Håndlaget gelato fra Grasse med 45+ smaker av lokale råvarer, ofte solgt fra triporteur. Sjekk plassering/åpning nær avreise.",
+   u:"https://www.lesglacesdandrea.fr/"},
+  {z:"verdon",n:"L'Étoile Givrée",a:"Rue de la Bourgade · Moustiers-Sainte-Marie",f:"bekreftet",p:"€",
+   why:"🍦 Håndlaget gelato og sorbet med lokale smaker og hjemmelagde kjeks, midt i Moustiers. God verdi (3 kuler ~4,50 €). Apr–nov.",
+   u:"https://www.moustiers.fr/fiche/letoile-givree/"},
+];
+
+const MODULER = [
+  {z:"cannes",n:"1 · Lérins-øydag",a:"Båt 15 min · ROLIG",f:"bekreftet",k:"ja",
+   why:"Bilfri skog, grunne viker og lett historie på Île Sainte-Marguerite. Den beste 3-åring-dagen.",
+   trans:"Båt fra Quai Laubeuf (15 min). Ingen bil.",intensitet:"Lav",kost:"~205–260 € for fem",
+   mat:"Picnic fra Marché Forville · middag Aux Bons Enfants (kun middag, kontant).",
+   pair:"Pairer med hjemmedag i bassenget. Ikke kombiner med lang biltur.",
+   u:"https://www.horizon-lerins.com/horaires/"},
+  {z:"cannes",n:"2 · Cannes til fots",a:"Til fots · ROLIG (halvdag)",f:"bekreftet",k:"delvis",
+   why:"Marked, gamleby og utsikt uten La Croisette-glitter. Marché Forville tidlig → Le Suquet → evt. Croix-des-Gardes.",
+   trans:"Til fots fra base.",intensitet:"Lav–middels (bratt opp Le Suquet)",kost:"marked ~20 € + lunsj ~100–150 €",
+   mat:"Frokost på markedet · lunsj Astoux et Brun · kveld hjemme/grill.",
+   pair:"Pairer med ettermiddag i bassenget. Gjør markedsdelen før kl. 10.",
+   u:"https://en.cannes-france.com/discover-visit/disctricts/the-suquet/"},
+  {z:"cannes",n:"3 · Kunst & keramikk nær Cannes",a:"Bil 15–20 min · ROLIG",f:"bekreftet",k:"delvis",
+   why:"Musée Bonnard ELLER Musée Picasso «La Guerre et la Paix» + keramikkgatene i Vallauris.",
+   trans:"Bil. Le Cannet 15 min / Vallauris 20 min.",intensitet:"Lav",kost:"museer rimelig + lunsj ~60–90 €",
+   mat:"Enkel lunsj i Le Cannet/Vallauris · middag i Mougins eller hjemme.",
+   pair:"Unngå mandag (Bonnard) og tirsdag (Vallauris). Pairer med Mougins-kveld.",
+   u:"https://www.museebonnard.fr/index.php/fr/informations-pratiques/horaires-acces-et-tarifs"},
+  {z:"cannes",n:"4 · Mougins-kveld",a:"Bil 20 min · ROLIG (kort)",f:"bekreftet",k:"delvis",
+   why:"Rusl middelalderlandsbyen sen ettermiddag, galleri-titt, panorama, tidlig middag.",
+   trans:"Bil ~20 min.",intensitet:"Lav",kost:"middag ~130–180 €",
+   mat:"L'Amandier (avslappet) — ikke 2-stjerners med 3-åring.",
+   pair:"Pairer med modul 3 (samme retning). Varier med hjemmedag mellom utflukter.",
+   u:"https://mouginstourisme.com/gastronomy-and-art-of-living/mougins-capital-of-gastronomy/?lang=en"},
+
+  {z:"nice",n:"5 · Vieux Nice — marked & socca",a:"Tog 35 min · MIDDELS",f:"bekreftet",k:"delvis",
+   why:"Cours Saleya-markedet → Vieux Nice → Place Rossetti → Colline du Château via gratis heis.",
+   trans:"TER ~35 min + trikk.",intensitet:"Lav–middels (brostein, varme)",kost:"tog ~60–90 € + streetfood ~40–55 €",
+   mat:"La Fougasserie · socca (Chez René/Lou Pilha Leva) + pan bagnat + BART · gelato Fenocchio · evt. L'Escalinada (lukket onsdag).",
+   pair:"Pairer med bading hjemme. Ikke samme dag som Cimiez-museumsdag.",
+   u:"https://www.explorenicecotedazur.com/en/event/marche-a-la-brocante-saleya/"},
+  {z:"nice",n:"6 · Cimiez — museer & olivenlund",a:"Tog + buss · ROLIG",f:"bekreftet",k:"delvis",
+   why:"Chagall (formiddag pga. middagsstenging) → Matisse + picnic i olivenlunden.",
+   trans:"TER til Nice + buss til Cimiez.",intensitet:"Lav",kost:"tog ~60–90 € + museer ~40–48 €",
+   mat:"Picnic i Jardins de Cimiez · evt. socca i Vieux Nice på vei til toget.",
+   pair:"KOLLIDERER med tirsdag (begge museer stengt!). Pairer med en rolig dag.",
+   u:"https://www.musee-matisse-nice.org/en/practical-information/"},
+  {z:"nice",n:"7 · Parc Phoenix + Promenade",a:"Tog + trikk · ROLIG",f:"bekreftet",k:"ja",
+   why:"Dyr, flamingoer og drivhus i Parc Phoenix (gratis under 12) → evt. gelato på Promenade des Anglais.",
+   trans:"TER + trikk linje 2, eller bil.",intensitet:"Lav",kost:"tog/bil ~15–90 € + inngang ~11–14 €",
+   mat:"Picnic i parken · middag i Cannes eller socca i Vieux Nice.",
+   pair:"Fleksibel «lett dag». Kolliderer ikke med noe.",
+   u:"https://www.parc-phoenix.org/le-parc/infos-pratiques/"},
+
+  {z:"antibes",n:"8 · Antibes gamleby + Picasso",a:"Tog 12–15 min · MIDDELS",f:"bekreftet",k:"ja",
+   why:"Marché Provençal tidlig → Place Nationale/Safranier → Musée Picasso (gratis under 18, stengt mandag).",
+   trans:"Tog ~12–15 min.",intensitet:"Lav–middels",kost:"tog ~30–45 € + lunsj/middag ~180–260 €",
+   mat:"Veziano + socca på markedet · lunsj Le Safranier (skygge) · middag Le Brûlot.",
+   pair:"Pairer med modul 10 (Jazz Off om kvelden). Kolliderer med mandag.",
+   u:"https://www.antibes-juanlespins.com/ma-ville/commerces-et-entreprises/occupation-du-domaine-public/halles-marches"},
+  {z:"antibes",n:"9 · Cap d'Antibes — strand & fyr",a:"Tog + buss/bil · ROLIG",f:"bekreftet",k:"ja",
+   why:"Plage de la Garoupe (slak bunn) → Phare + Sanctuaire (10 min gange). Kyststien er IKKE for 3-åring.",
+   trans:"Antibes + buss/bil til Garoupe.",intensitet:"Lav",kost:"parkering gratis + strandlunsj ~60–100 €",
+   mat:"Lunsj strandkafé Garoupe · middag i Antibes eller hjemme.",
+   pair:"Pairer med rolig kveld. Sjekk vær (vind påvirker sti/strand).",
+   u:"https://www.antibesjuanlespins.com/a-voir-a-faire/culture-et-patrimoine/le-patrimoine/la-chapelle-de-la-garoupe-2031654"},
+  {z:"antibes",n:"9b · Cap d'Antibes + La Plage du Cap",a:"Tog/bil · ROLIG",f:"bekreftet",k:"ja",
+   why:"Strandpromenade, fyret (Phare de la Garoupe) og lunsj på La Plage du Cap — fin kombinasjon av natur og mat ved vannet.",
+   trans:"Tog til Antibes + buss/bil til Garoupe.",intensitet:"Lav",kost:"~150–250 € for fem",
+   mat:"Lunsj La Plage du Cap (ved stranda) · middag hjemme i Cannes.",
+   pair:"Bra etter en rolig morgen, eller før Juan-les-Pins Jazz Off om kvelden (modul 10).",
+   u:"https://www.antibesjuanlespins.com/"},
+  {z:"antibes",n:"10 · Juan-les-Pins + Jazz Off",a:"Tog 7–18 min · ROLIG (kveld)",f:"bekreftet",k:"delvis",
+   why:"Gratis Jazz Off-konsert 19:15–20:15 i Petite Pinède (13.–19. juli) → strandpromenade.",
+   trans:"Tog ~7–18 min.",intensitet:"Lav",kost:"tog ~25–40 € + middag ~100–150 € + konsert GRATIS",
+   mat:"Tidlig middag Ti-Toques (rolig sidegate) før kl. 19:15.",
+   pair:"Pairer etter en rolig dag (modul 9). Sen kveld — ikke etter en utmattende dagstur.",
+   u:"https://jazzajuan.com/en/around-the-festival/"},
+  {z:"antibes",n:"11 · Biot — glassverk + landsby",a:"Tog + buss · ROLIG (halvdag)",f:"bekreftet",k:"ja",
+   why:"Verrerie de Biot (gratis, se glassblåsing) → Biot landsby → evt. Musée Léger (stengt tirsdag).",
+   trans:"Antibes + buss, eller bil.",intensitet:"Lav–middels",kost:"glassverk gratis + lunsj ~60–90 €",
+   mat:"Lunsj L'Auberge du Vieux Village (crêperie).",
+   pair:"Kolliderer med tirsdag (Léger stengt). Pairer med strand/halvdag.",
+   u:"https://www.verreriebiot.com/en/the-glass-ecomuseum/pratical-information/"},
+
+  {z:"monaco",n:"12 · Monaco-dagen",a:"Tog ~1 t · MIDDELS",f:"bekreftet",k:"ja",
+   why:"Oceanografisk museum → vaktskifte kl. 11:55 → Jardins Saint-Martin (flat) eller nye Jardin Exotique.",
+   trans:"Tog ~57 min–1 t.",intensitet:"Middels (trapper på klippen)",kost:"tog ~120–150 € + museum ~73 € + lunsj ~50–60 €",
+   mat:"Lunsj Place d'Armes-markedet (Chez Roger socca) · middag tilbake i Cannes.",
+   pair:"Hel dag alene. Kan ta kort Èze-stopp på vei hjem (buss 602), men da blir dagen lang.",
+   u:"https://musee.oceano.org/en/practical-info/"},
+  {z:"monaco",n:"13 · Kornisjene øst: Èze + Villefranche",a:"Tog + buss · TUNG morgen",f:"bekreftet",k:"delvis",
+   why:"Tidlig til Èze + Jardin Exotique (FØR kl. 10) → ned til Villefranche: Rue Obscure + rolig bad.",
+   trans:"Tog + buss 602.",intensitet:"Høy i Èze, rolig i Villefranche",kost:"tog/buss ~80–110 € + Èze-hage 20 € + lunsj ~70–90 €",
+   mat:"Lunsj Le Cosmo (Villefranche) · middag Cannes.",
+   pair:"Splitt gruppen i Èze. Kolliderer med Monaco-dagen (begge øst, lange).",
+   u:"https://jardinexotique-eze.fr/en/informations/"},
+  {z:"monaco",n:"14 · Villa Ephrussi + Villefranche-bad",a:"Tog ~1 t · ROLIG",f:"bekreftet",k:"ja",
+   why:"Villa Ephrussi med fonteneshow → Promenade Maurice Rouvier (vogn-vennlig) → Villefranche-bad.",
+   trans:"Tog til Beaulieu + buss/gange.",intensitet:"Lav–middels",kost:"tog/buss ~90–120 € + Ephrussi 60 € + lunsj ~60–90 €",
+   mat:"Lunsj Restaurant Béatrice (i villaen) eller brasserie i Beaulieu · middag Cannes/picnic.",
+   pair:"Den roligste østmodulen — bra «restitusjonsdag» mellom Monaco og Èze. Sjekk 11. juli.",
+   u:"https://www.villa-ephrussi.com/fr/preparer-sa-visite/conditions-dacces"},
+
+  {z:"monaco",n:"14b · Cap-Ferrat + Èze light",a:"Tog/bil · ROLIG–MIDDELS",f:"bekreftet",k:"delvis",
+   why:"Villa Ephrussi (hager + fonteneshow) + et kort stopp i Èze hvis energien holder. Alternativt rolig bad i Villefranche i stedet for Èze.",
+   trans:"Tog til Beaulieu + buss.",intensitet:"Lav–middels",kost:"~200–280 € for fem",
+   mat:"Lunsj Capitaine Cook (Saint-Jean) eller Restaurant Béatrice i villaen.",
+   pair:"Perfekt søndag. Hopp over Èze-delen med trøtt 3-åring.",
+   u:"https://www.villa-ephrussi.com/"},
+  {z:"grasse",n:"15 · Parfyme i Grasse",a:"Bil 30–40 min · MIDDELS",f:"bekreftet",k:"delvis",
+   why:"Fragonard gratis omvisning + lag-din-egen-parfyme (Galimard/Molinard, alder 4+) + evt. Musée International de la Parfumerie.",
+   trans:"Bil ~30–40 min (tog finnes).",intensitet:"Lav–middels",kost:"Fragonard 0 € + atelier ~100–120 € + lunsj ~80–120 €",
+   mat:"Lunsj Le Gazan eller gamlebysbrasserie · middag i Grasse eller Cannes.",
+   pair:"Atelier MÅ bookes. Pairer med Tourrettes/Bar-sur-Loup (nær).",
+   u:"https://usines-parfum.fragonard.com/en/factories/the-historical-factory/"},
+  {z:"grasse",n:"16 · Kunst i Saint-Paul & Vence",a:"Bil 40–50 min · MIDDELS",f:"bekreftet",k:"delvis",
+   why:"Fondation Maeght (skulpturhage) + Chapelle Matisse + Saint-Paul gamleby tidlig morgen/etter 17.",
+   trans:"Bil ~40–50 min.",intensitet:"Middels (brostein, varme)",kost:"Maeght 36 € + kapell ~14 € + lunsj ~90–130 €",
+   mat:"Lunsj Sous les Pins (Maeght) eller Bistro du Peyra (Vence) · middag Vence/Cannes.",
+   pair:"KOLLIDERER med 14. juli + søndag/mandag (kapellet stengt). Pairer med Tourrettes.",
+   u:"https://www.fondation-maeght.com/infos-pratiques/?lang=fr"},
+  {z:"grasse",n:"17 · Fjellandsbyer & juv",a:"Bil 45–60 min · MIDDELS–TUNG",f:"bekreftet",k:"delvis",
+   why:"Tourrettes-sur-Loup → Gourdon (utsikt, glassverk, slottet stengt) → Cascades du Saut du Loup.",
+   trans:"Bil. Smale, svingete fjellveier (D6/D3).",intensitet:"Middels–høy",kost:"foss 5 € + lunsj ~70–110 € (rimeligste modul)",
+   mat:"Pizzeria du Saut du Loup (ved fossen) eller L'École des Filles · middag Auberge des Gorges du Loup.",
+   pair:"Pairer med Grasse-modulen (samme retning). Bæremeis, stup ved utsikt.",
+   u:"https://cascades-sautduloup.com/"},
+  {z:"grasse",n:"18 · Østlige fjellandsbyer: Coaraze",a:"Bil 53 min+ · MIDDELS–TUNG",f:"bekreftet",k:"delvis",
+   why:"Coaraze gamleby + Cocteau-solurene. Sainte-Agnès (Fort Maginot) kun hvis dere uansett er østover.",
+   trans:"Coaraze ~53 min; Sainte-Agnès ~1 t 15–1 t 30.",intensitet:"Middels",kost:"lavt (gratis landsbyer + lunsj ~70–100 €)",
+   mat:"Lokale landsbyrestauranter (bekreft nær avreise) — ta med vann/snacks.",
+   pair:"Mest for foreldre/eldre barn. I grenseland med 3-åring — kan nedprioriteres.",
+   u:"https://www.villagesetpatrimoine.fr/coaraze/"},
+
+  {z:"tropez",n:"19 · Saint-Tropez via direkte båt",a:"Bil + shuttle / båt · ⚠️ LANGT",f:"bekreftet",k:"delvis",
+   why:"Den svakeste dagsturen for denne familien. Vieux Port → La Ponche → Citadellet → Place des Lices.",
+   trans:"To måter — ANBEFALT: kjør til Sainte-Maxime (~1 t 30, gratis parkering «La Fourmi») og ta Bateaux Verts shuttle 15 min over bukta (avgang ca. hvert 15. min i juli, fleksibel retur til kvelden). Alternativ: direkte båt Trans Côte d'Azur fra Cannes (~1 t 15, ut ~10:15 / FAST retur 16:30, må reserveres). Kjør aldri bil helt inn til Saint-Tropez i juli (parkeringsmareritt).",intensitet:"Høy reisebelastning",kost:"shuttle t/r ~50 € (eller direkte båt ~80 €) + lunsj ~100–130 €",
+   mat:"La Tarte Tropézienne · lunsj Le Café (~25 €) · Sénéquier kun for én drikk · middag i Cannes.",
+   pair:"Selvstendig heldagstur — kolliderer med alt annet samme dag. Bil+shuttle gir mest fleksibel hjemreise.",
+   u:"https://www.bateauxverts.com/horaires-tarifs/"},
+  {z:"tropez",n:"20 · Port Grimaud + Sainte-Maxime",a:"Bil + shuttle · ⚠️ LANGT",f:"bekreftet",k:"ja",
+   why:"Port Grimaud kanalbåt (flatt, morsomt for 3-åring) + evt. shuttle over til Saint-Tropez. Roligere St-Tropez-alternativ.",
+   trans:"Bil til Sainte-Maxime (1 t 30 / 2–4 t i trafikk) + Bateaux Verts shuttle.",intensitet:"Middels",kost:"bil ~30–40 € + shuttle ~50 € + lunsj ~80–120 €",
+   mat:"Lunsj kanalside i Port Grimaud eller Sainte-Maxime · middag i Cannes.",
+   pair:"Ikke legg til lørdag (verst trafikk). Pairer med Gassin/Ramatuelle hvis overskudd.",
+   u:"https://www.grimaud-provence.com/inspirez-vous/la-nature-a-tout-moment/balade-bateau-port-grimaud/"},
+
+  {z:"verdon",n:"21 · Verdon-canyon + turkis innsjø",a:"Bil 2–2,5 t · ⚠️ LANGT",f:"bekreftet",k:"delvis",
+   why:"Sonens sterkeste «unikt»-kort. Pedalo rett inn i canyonmunningen ved Pont du Galetas → bad i Lac de Sainte-Croix → Moustiers.",
+   trans:"Bil 2–2,5 t hver vei (ikke 1 t 42 som kart hevder). Start senest 07:30.",intensitet:"Høy (lang bil)",kost:"~260–360 € for fem",
+   mat:"Snack de l'Étoile (ved bryggen) eller picnic · tidlig middag Côté Jardin/La Treille Muscate.",
+   pair:"Route des Crêtes anbefales hoppet over (svimlende stup). Kolliderer med alt — dette ER hele dagen.",
+   u:"https://base-nautique-etoile.fr/"},
+  {z:"verdon",n:"22 · Verdon over to dager (overnatting)",a:"Bil + 1 natt · ANBEFALT",f:"bekreftet",k:"ja",
+   why:"Best hvis lavendel + canyon + innsjø skal nytes uten stress. Dag 1: Moustiers + middag. Dag 2: lavendel tidlig → padling midt på dagen.",
+   trans:"Som modul 21, men 1 natt i/ved Moustiers.",intensitet:"Lav–middels (bilen fordelt)",kost:"modul 21 + overnatting ~120–200 €",
+   mat:"Côté Jardin (dag 1) · Snack de l'Étoile (dag 2 lunsj).",
+   pair:"Ingen 5-timers bil-dag, 3-åringen får sove. Bestill overnatting tidlig (høysesong).",
+   u:"https://www.moustiers.fr/"},
+  {z:"grasse",n:"23 · Aix-en-Provence halvdag",a:"Bil 1,5–2 t · MIDDELS · langt",f:"sannsynlig",k:"ja",
+   why:"Cours Mirabeau, markeder, fontener og provençalsk by-sjarm. Calissons og iskrem til barna.",
+   trans:"Bil (tog mulig, men tregere). ~1,5–2 t hver vei.",intensitet:"Lav–middels",kost:"~150–220 € for fem",
+   mat:"Markedspicnic eller enkle bistroer i sidegatene rundt Cours Mirabeau.",
+   pair:"Langt vestover — egen dag. Bra hvis dere vil ha en «by-dag» utenom kysten.",
+   u:"https://www.aixenprovencetourism.com/"},
+];
+
+// Hvilke konkrete perler og spisesteder hører til HVER dagstur (ikke hele sonen).
+const LINKS = {
+  "1 · Lérins-øydag":{see:["Île Sainte-Marguerite","Île Saint-Honorat","Marché Forville"],eat:["La Differnnce","La Tonnelle","Poissonnerie Forville","Aux Bons Enfants","Astoux et Brun","Nivà Gelateria"]},
+  "2 · Cannes til fots":{see:["Marché Forville","Le Suquet (gamlebyen)","Parc de la Croix-des-Gardes","14. juli – fyrverkeri i Cannes"],eat:["Poissonnerie Forville","Astoux et Brun","Aux Bons Enfants","Da Bouttau","Da Laura","Le Jardin","Côté Jardin by Steve Moracchini","Jean-Luc Pelé","Itinéraire Café","Nivà Gelateria"]},
+  "3 · Kunst & keramikk nær Cannes":{see:["Musée Bonnard","Musée Picasso + Vallauris"],eat:["L'Amandier de Mougins","Côté Jardin by Steve Moracchini","Aux Bons Enfants","Jean-Luc Pelé","Nivà Gelateria"]},
+  "4 · Mougins-kveld":{see:["Mougins"],eat:["L'Amandier de Mougins","Côté Jardin by Steve Moracchini","Jean-Luc Pelé","Nivà Gelateria"]},
+  "5 · Vieux Nice — marked & socca":{see:["Vieux Nice + Cours Saleya","Colline du Château"],eat:["Chez Pipo","Chez René Socca","Chez Thérésa","BART (focaccia)","Chez Acchiardo","L'Escalinada","Les Délices de Mathias","Boulangerie La Niçoise","La Fougasserie","Fenocchio"]},
+  "6 · Cimiez — museer & olivenlund":{see:["Musée Matisse (Cimiez)","Musée Chagall"],eat:["La Fougasserie","Les Délices de Mathias","Chez Thérésa","Fenocchio"]},
+  "7 · Parc Phoenix + Promenade":{see:["Parc Phoenix"],eat:["Fenocchio","La Fougasserie"]},
+  "8 · Antibes gamleby + Picasso":{see:["Marché Provençal","Fort Carré"],eat:["Boulangerie Veziano","La Torref de Fersen","Bistrot Margaux","Le Safranier","La Petite Escale","Le Brûlot","Le Vauban","Amarena"]},
+  "9 · Cap d'Antibes — strand & fyr":{see:["Phare + Sanctuaire de la Garoupe","Plage de la Garoupe"],eat:["La Plage du Cap","Le Safranier","Boulangerie Veziano","Amarena"]},
+  "9b · Cap d'Antibes + La Plage du Cap":{see:["Plage de la Garoupe","Phare + Sanctuaire de la Garoupe"],eat:["La Plage du Cap","Le Safranier","Amarena"]},
+  "10 · Juan-les-Pins + Jazz Off":{see:["Jazz à Juan «Off» (gratis)"],eat:["Ti-Toques","Bistrot Margaux","Papilla"]},
+  "11 · Biot — glassverk + landsby":{see:["Verrerie de Biot (glassverk)"],eat:["L'Auberge du Vieux Village","Amarena"]},
+  "12 · Monaco-dagen":{see:["Monaco – Le Rocher & akvariet"],eat:["Place d'Armes-markedet (Chez Roger)","L'Atelier du Glacier"]},
+  "13 · Kornisjene øst: Èze + Villefranche":{see:["Èze village","Villefranche-sur-Mer"],eat:["La Grignotière","Le Cosmo","Les Garçons","Glacier Feracci"]},
+  "14 · Villa Ephrussi + Villefranche-bad":{see:["Villa Ephrussi de Rothschild","Villa Kérylos","Villefranche-sur-Mer"],eat:["Restaurant Béatrice","Capitaine Cook","La Grignotière","Le Cosmo","Les Garçons","Glacier Feracci"]},
+  "14b · Cap-Ferrat + Èze light":{see:["Villa Ephrussi de Rothschild","Èze village","Villefranche-sur-Mer"],eat:["Capitaine Cook","La Grignotière","Restaurant Béatrice","Glacier Feracci"]},
+  "15 · Parfyme i Grasse":{see:["Grasse – lag din egen parfyme"],eat:["Le Gazan","Les Glaces d'Andrea"]},
+  "16 · Kunst i Saint-Paul & Vence":{see:["Saint-Paul-de-Vence + Fondation Maeght","Chapelle du Rosaire (Matisse)"],eat:["Sous les Pins","Le Bistro du Peyra","Glacier de la Fontaine"]},
+  "17 · Fjellandsbyer & juv":{see:["Tourrettes-sur-Loup","Gourdon","Cascades du Saut du Loup"],eat:["Pizzeria du Saut du Loup","L'École des Filles","Auberge des Gorges du Loup"]},
+  "18 · Østlige fjellandsbyer: Coaraze":{see:["Coaraze (solur-landsbyen)","Sainte-Agnès + Fort Maginot"],eat:["Auberge du Soleil"]},
+  "19 · Saint-Tropez via direkte båt":{see:["Saint-Tropez gamleby & La Ponche"],eat:["La Tarte Tropézienne","Le Café","La Ponche","Sénéquier","Barbarac"]},
+  "20 · Port Grimaud + Sainte-Maxime":{see:["Port Grimaud («Lille Venezia»)","Gassin & Ramatuelle"],eat:["Lily's","Barbarac"]},
+  "21 · Verdon-canyon + turkis innsjø":{see:["Pont du Galetas / Lac de Sainte-Croix","Moustiers-Sainte-Marie"],eat:["Snack de l'Étoile","Côté Jardin","La Treille Muscate","L'Étoile Givrée"]},
+  "22 · Verdon over to dager (overnatting)":{see:["Pont du Galetas / Lac de Sainte-Croix","Moustiers-Sainte-Marie","Valensole-platået (lavendel)"],eat:["Côté Jardin","La Treille Muscate","Snack de l'Étoile","L'Étoile Givrée"]},
+  "23 · Aix-en-Provence halvdag":{see:["Aix-en-Provence – Cours Mirabeau"],eat:[]},
+};
+
+// Fyldig beskrivelse + tidsskjema per dagstur
+const MODDETAIL = {
+  "1 · Lérins-øydag":{
+    long:"Lérins-øyene ligger bare 15 minutters ferge ut fra Cannes, men føles som en annen verden. Île Sainte-Marguerite er den største: bilfri, dekket av eukalyptus- og pinjeskog, med Fort Royal der «Mannen med jernmasken» satt fanget på 1600-tallet (i dag Musée de la Mer). Naboøya Saint-Honorat eies av cisterciensermunker som har drevet kloster her i over 1600 år og lager egen vin. Høydepunktene er skogsstiene, de grunne, skjermede vikene på sørsiden og selve fortet. Dette er den mest avslappede og 3-åring-vennlige dagen i hele guiden.",
+    plan:["08:00 — Innom Marché Forville for picnic (ost, frukt, pan bagnat)","09:30 — Tidlig ferge fra Quai Laubeuf (kjøligere, mindre folk)","10:00 — Skogstur + bad i rolig vik på sørsiden","12:30 — Picnic i skyggen","14:00 — Fort Royal / Musée de la Mer","16:00 — Ferge tilbake + basseng hjemme","Kveld — Middag Aux Bons Enfants (book, kun kontant)"]},
+  "2 · Cannes til fots":{
+    long:"Cannes er mer enn La Croisette og filmfestivalen. Til fots fra huset deres ser dere det ekte Cannes: Marché Forville (byens provençalske matmarked siden 1934, der restaurantene handler), de bratte brosteinsgatene opp til Le Suquet — middelalderkjernen med klokketårnet, Notre-Dame-d'Espérance og panorama over bukta — og rue Meynadier, den gamle handlegata full av oste- og charcuteributikker. Avslutt gjerne med en skogstur i Parc de la Croix-des-Gardes for utsikt uten turister.",
+    plan:["07:30 — Marché Forville før varmen og folkemengdene","09:30 — Rusle rue Meynadier (delikatesser til hjemmemiddag)","10:00 — Opp til Le Suquet: klokketårn + utsikt (bær 3-åringen)","11:30 — Hjem til basseng + lunsj, siesta i varmen","17:00 — Evt. kort sløyfe i Croix-des-Gardes","20:00 — Middag Astoux et Brun ved havna"]},
+  "3 · Kunst & keramikk nær Cannes":{
+    long:"En rolig halvdag i Picassos fotspor like utenfor Cannes. I Le Cannet ligger Musée Bonnard, verdens eneste museum viet maleren som bodde her — lite, vakkert og sjelden travelt. I keramikkbyen Vallauris jobbet Picasso med leire på 1950-tallet; hans monumentale veggmaleri «La Guerre et la Paix» fyller et romansk kapell, og gatene rundt er fulle av ekte pottemakerverksteder. Kjølige museumsbesøk og flate keramikkgater — fint på en varm dag.",
+    plan:["10:00 — Musée Bonnard (svalt) — kort, fokusert besøk","11:30 — Lunsj i Le Cannet/Vallauris","14:00 — Picasso-kapellet + keramikkverksteder utenfor hovedgata","16:00 — Hjem til basseng","NB — Bonnard stengt mandag, Vallauris ofte stengt tirsdag"]},
+  "4 · Mougins-kveld":{
+    long:"Mougins er en perfekt bevart middelalderlandsby på en høyde 20 minutter fra Cannes, kjent som gastronomi-landsbyen der Roger Vergé skapte sitt rykte. Brosteinssmugene snor seg i spiral opp til toppen, med kunstgallerier, panorama og noen av kystens beste restauranter. Roligst og vakrest sent på ettermiddagen når dagsturistene har dratt og lyset blir gyllent.",
+    plan:["17:30 — Kjør opp, rusle smugene + galleri-titt i gyllent lys","18:30 — Panoramautsikt fra toppen","19:00 — Tidlig middag L'Amandier (avslappet, barnevennlig)","21:00 — Hjem (kort kjøring)"]},
+  "5 · Vieux Nice — marked & socca":{
+    long:"Nice er 35 min med tog, og gamlebyen er Rivieraens mest levende. Cours Saleya-markedet bugner av blomster, grønnsaker og krydder (tir–søn), de okergule barokkgatene fører til Place Rossetti og katedralen, og over alt troner Colline du Château med byens beste utsikt og en foss. Nice var lenge italiensk/savoiansk, og det merkes i kjøkkenet — «cuisine nissarde» er sin egen tradisjon: socca, pan bagnat, pissaladière. Dette er først og fremst en mat-dag.",
+    plan:["09:00 — Tog Cannes→Nice, rett til Cours Saleya-markedet","10:00 — Socca + pan bagnat-runde i gamlebyen","11:30 — Place Rossetti + gelato hos Fenocchio","12:00 — Gratis heis opp til Colline du Château (utsikt, foss, skygge)","14:00 — Tog hjem + basseng (unngå ettermiddagsvarmen)","Alt — Bli til tidlig middag på L'Escalinada (lukket onsdag)"]},
+  "6 · Cimiez — museer & olivenlund":{
+    long:"Oppe i grønne Cimiez, høyt over Nice, ligger to av Rivieraens fineste museer i rolige omgivelser. Musée Matisse holder til i en rød villa omgitt av en eldgammel olivenlund med romerske ruiner; Musée Chagall litt lenger ned har verdens største samling av kunstnerens bibelske syklus. Olivenlunden er det egentlige barnegullet — plass til å løpe og skygge til picnic. En kulturdag med lavt tempo.",
+    plan:["09:30 — Chagall først (middagsstengt i juli — ta det om formiddagen)","11:00 — Picnic i olivenlunden ved Matisse-museet","12:00 — Musée Matisse (kort runde) + romerske ruiner","14:00 — Tilbake mot sentrum/tog","NB — Begge museer STENGT tirsdag"]},
+  "7 · Parc Phoenix + Promenade":{
+    long:"Parc Phoenix vest i Nice er en 7 hektar botanisk park bygget for barn: flamingoer, lemurer, en krokodille, dammer og et av Europas største tropiske drivhus. Gratis for barn under 12 og rett ved trikk linje 2. Den beste enkeltaktiviteten i Nice for en 3-åring, og fin for 10- og 13-åringen også. Kombiner gjerne med en spasertur og gelato langs Promenade des Anglais.",
+    plan:["09:30 — Parc Phoenix ved åpning (dyr er aktive, kjøligere)","12:00 — Picnic i parken","13:00 — Evt. trikk inn til Promenade des Anglais + gelato","15:00 — Hjem til basseng"]},
+  "8 · Antibes gamleby + Picasso":{
+    long:"Antibes er 12–15 min med tog og har en av kystens best bevarte gamlebyer innenfor festningsmurene. Marché Provençal (overbygd hall fra 1920-tallet på Cours Masséna) er et av Rivieraens beste markeder. I Château Grimaldi ved havet ligger Musée Picasso — kunstneren brukte slottet som atelier i 1946 og etterlot en hel samling. Rusle videre til Place Nationale og det stille Place du Safranier, og se Fort Carré ved Port Vauban.",
+    plan:["09:00 — Tog til Antibes, Marché Provençal før kl. 10","10:30 — Musée Picasso (Château Grimaldi) — gratis for barn","12:00 — Lunsj på skyggefulle Place du Safranier","14:00 — Tog hjem + basseng, ELLER videre til Juan om kvelden","NB — Picasso + Fort Carré STENGT mandag (= ikke 13. juli)"]},
+  "9 · Cap d'Antibes — strand & fyr":{
+    long:"Cap d'Antibes er den frodige, eksklusive halvøya sør for byen. Plage de la Garoupe er en av få roligere bukter med slak sandbunn og livredder om sommeren — fin for en 3-åring. Derfra er det ti minutters gange opp til Phare de la Garoupe (fyret, gjenåpnet 2024, 114 trinn) og det lille sjømannskapellet med marine ex-voto. Kyststien Sentier de Tirepoil er praktfull, men IKKE for 3-åring (trapper og stup uten rekkverk).",
+    plan:["09:00 — Bil/buss til Garoupe-parkeringen (kom før 9 for plass)","09:30 — Rolig bading på Plage de la Garoupe","12:00 — Lunsj ved stranda (La Plage du Cap)","14:00 — Opp til fyret + kapellet (utsikt)","15:30 — Hjem til siesta"]},
+  "9b · Cap d'Antibes + La Plage du Cap":{
+    long:"En enklere, mat-fokusert variant av Cap-dagen: kombinér en rolig formiddag på Plage de la Garoupe med en lang lunsj på La Plage du Cap — en avslappet «barefoot» strandrestaurant rett ved vannet med grillet fisk og salater, der barna kan leke i nærheten etterpå. Avslutt med fyret og kapellet for utsikten. Lite stress, mye sjø.",
+    plan:["10:00 — Strand på Garoupe (skygge, slak bunn)","12:30 — Lang lunsj La Plage du Cap","14:30 — Fyret + Sanctuaire de la Garoupe","16:00 — Hjem","Tips — Pairer fint før Jazz Off i Juan (modul 10)"]},
+  "10 · Juan-les-Pins + Jazz Off":{
+    long:"Juan-les-Pins er Antibes' livlige badeby og hjemstedet for Jazz à Juan — en av Europas eldste jazzfestivaler (siden 1960, med legender som Miles Davis og Ray Charles på plakaten). I deres uke (festivalen går 9.–19. juli) er det gratis «Jazz Off»-konserter hver kveld 19:15–20:15 i pinjelunden Petite Pinède — festivalstemning uten billett. Perfekt med en tidlig middag.",
+    plan:["18:00 — Tog til Juan-les-Pins","18:15 — Tidlig middag Ti-Toques (rolig sidegate)","19:15 — Gratis Jazz Off i Petite Pinède","20:15 — Gelato hos Papilla + strandpromenade","21:00 — Tog hjem","Plan B — Én voksen tar 3-åringen hjem tidligere"]},
+  "11 · Biot — glassverk + landsby":{
+    long:"Biot er en liten middelalderlandsby kjent for sitt boblete glass. På Verrerie de Biot (nede ved RN7) kan dere se mestere blåse glass live fra et sikret punkt — gratis inngang til hall, galleri og butikk. Oppe på høyden ligger selve landsbyen med Place des Arcades og kunsthåndverk, og Musée Fernand Léger med fargesprakende mosaikker. En kort, annerledes halvdag.",
+    plan:["10:00 — Verrerie de Biot — se glassblåsing (omvisning 11:30)","11:30 — Opp til Biot landsby + Place des Arcades","12:30 — Lunsj L'Auberge du Vieux Village (crêperie)","14:00 — Evt. Musée Léger (stengt tirsdag) + gelato","NB — Glassverk og landsby er to atskilte busstopp"]},
+  "12 · Monaco-dagen":{
+    long:"Fyrstedømmet Monaco er ~1 t med tog. Den gamle bydelen Le Rocher ligger på en bilfri klippe og samler høydepunktene: Musée Océanographique (et storslått akvarium grunnlagt av prins Albert I — hai, korallbasseng og touch-pools, en magnet for barn), fyrstepalasset med vaktskifte kl. 11:55, katedralen med Grace Kellys grav, og de rolige Jardins Saint-Martin. Det nyrenoverte Jardin Exotique (gjenåpnet mars 2026) har kaktus, hule og lekeplass. Monaco er dyrt — spis på markedet.",
+    plan:["09:30 — Tog Cannes→Monaco, opp til Le Rocher","10:00 — Musée Océanographique (akvariet) ved åpning","11:55 — Vaktskifte på Place du Palais","12:30 — Rimelig lunsj på Place d'Armes-markedet (Chez Roger)","14:00 — Jardins Saint-Martin / katedralen + is hos L'Atelier du Glacier","16:00 — Tog hjem (Monaco er dyrt om kvelden)"]},
+  "13 · Kornisjene øst: Èze + Villefranche":{
+    long:"De tre korniche-veiene øst for Nice byr på Rivieraens mest dramatiske kystlandskap. Èze er den ikoniske «ørnereden» 400 m over havet, med et Jardin Exotique på toppen og svimlende utsikt — men også kystens mest beryktede turistfelle midt på dagen. Lenger ned ligger sjarmerende Villefranche-sur-Mer med pastellfasader, den overbygde middelaldergata Rue Obscure (fra 1260) og Plage des Marinières, en av kystens roligste bukter.",
+    plan:["08:30 — Tidlig opp til Èze FØR kl. 10 (tomme gater, kjølig)","09:00 — Jardin Exotique + landsbysmugene","11:00 — Ned til Villefranche (tog/buss)","12:00 — Lunsj Le Cosmo + Rue Obscure","14:00 — Rolig bading på Plage des Marinières","16:30 — Tog hjem","Tips — Del gruppen i Èze (bratt for 3-åring)"]},
+  "14 · Villa Ephrussi + Villefranche-bad":{
+    long:"Saint-Jean-Cap-Ferrat er en grønn, eksklusiv halvøy mellom Nice og Monaco. Villa Ephrussi de Rothschild er et rosa palass fra 1912 omgitt av ni temahager (fransk, spansk, japansk, eksotisk) med et musikalsk fonteneshow som danser til musikk ~hvert 20. minutt — et reelt høydepunkt for barn. Den flate Promenade Maurice Rouvier (barnevogn-vennlig) og rolig bad i Villefranche gjør dette til den mest avslappede «østdagen».",
+    plan:["10:00 — Tog til Beaulieu + buss, Villa Ephrussi ved åpning","10:30 — Hager + fonteneshow + barneaktiviteter","12:30 — Lunsj (Restaurant Béatrice i villaen eller Capitaine Cook)","14:00 — Promenade Maurice Rouvier (flat, vogn-vennlig)","15:00 — Bad i Villefranche + gelato hos Feracci","17:00 — Tog hjem","NB — Sjekk åpning 11. juli"]},
+  "14b · Cap-Ferrat + Èze light":{
+    long:"En fleksibel variant: bruk formiddagen på Villa Ephrussis hager og fonteneshow, og legg til et kort stopp i Èze landsby på vei hjem hvis energien holder — ellers bytt Èze mot rolig bad i Villefranche. Skreddersydd for en dag der dere vil ha det fint uten å presse 3-åringen. En rolig søndag-favoritt.",
+    plan:["10:00 — Villa Ephrussi (hager + fonteneshow)","12:30 — Lunsj Capitaine Cook (Saint-Jean)","14:30 — Valg: kort Èze-stopp (bær 3-åringen) ELLER bad i Villefranche","16:30 — Hjem"]},
+  "15 · Parfyme i Grasse":{
+    long:"Grasse har vært verdens parfymehovedstad siden 1600-tallet, takket være blomsterdyrking i baklandet. Her kan dere gjøre noe dere ikke kan andre steder: lage deres egen parfyme på flaske i et profesjonelt atelier (Galimard eller Molinard, fra 4 år). Fragonard tilbyr gratis omvisning i den historiske fabrikken, og Musée International de la Parfumerie forteller hele historien. Gamlebyen er ekte og levd-i, ikke kulisse.",
+    plan:["09:30 — Kjør til Grasse, Fragonard gratis omvisning","10:30 — Parfyme-atelier (book) — del gruppen, én voksen tar 3-åringen","12:30 — Lunsj Le Gazan + gelato (Les Glaces d'Andrea)","14:00 — Evt. Musée de la Parfumerie","15:30 — Hjem (kan kombineres med Tourrettes på vei)"]},
+  "16 · Kunst i Saint-Paul & Vence":{
+    long:"Baklandet nord for Nice er kunstnerland. Fondation Maeght i Saint-Paul-de-Vence er et av Europas viktigste private moderne-kunstmuseer, med Miró-labyrint, Giacometti-gård og skulpturpark ute — familievennlig. Selve Saint-Paul er en av Frankrikes vakreste landsbyer (men overrent midt på dagen). I Vence ligger Chapelle du Rosaire, Matisses eget gesamtkunstverk som han kalte sitt mesterverk — et lite, lysende rom han designet komplett.",
+    plan:["09:00 — Saint-Paul gamleby tidlig (før busslastene)","10:00 — Fondation Maeght (skulpturhage, barneverksted onsdager)","12:00 — Lunsj Sous les Pins (Maeght) eller Bistro du Peyra (Vence)","14:00 — Chapelle du Rosaire i Vence (kort, krever ro)","15:30 — Gelato i Saint-Paul (Glacier de la Fontaine), hjem","NB — Kapellet STENGT søndag, mandag OG 14. juli"]},
+  "17 · Fjellandsbyer & juv":{
+    long:"En kjøretur inn i det dramatiske baklandet langs Gorges du Loup. Tourrettes-sur-Loup er Frankrikes eneste fiol-landsby, med ekte håndverksverksteder og Confiserie Florian (kandiserte blomster — gøy for barn). Gourdon er en spektakulær klippelandsby med utsikt helt til havet. Cascades du Saut du Loup er et kort, forfriskende fossestopp i juvet. Merk: smale, svingete fjellveier og turistfelle i Gourdon midt på dagen.",
+    plan:["09:30 — Tourrettes-sur-Loup (håndverk + Confiserie Florian)","11:00 — Cascades du Saut du Loup (kort stopp, bading forbudt)","12:00 — Lunsj ved fossen eller Bar-sur-Loup","14:00 — Gourdon (utsikt, glassverk) — utenom folketoppen","16:00 — Hjem (kjør forsiktig på fjellveiene)"]},
+  "18 · Østlige fjellandsbyer: Coaraze":{
+    long:"Dypt i det stille baklandet øst for Nice ligger noen av kystens mest autentiske, lite besøkte landsbyer. Coaraze («solens landsby», 667 m) er berømt for sine kunstner-solur, bl.a. ett av Jean Cocteau. Lenger øst ligger Sainte-Agnès, Europas høyeste kystlandsby (800 m), med et Maginot-fort hugget inn i fjellet og svimlende havutsikt. For dem som vil se det ekte arrière-pays — men lange, svingete kjøreturer, mest givende for de voksne og de store barna.",
+    plan:["09:30 — Kjør til Coaraze, rusle solur-smugene (rolig)","11:00 — Lunsj Auberge du Soleil i landsbyen","13:00 — Evt. Sainte-Agnès (Fort Maginot — SMS 48 t før, stengt man/tirs)","16:00 — Hjem","Tips — Vurder å nedprioritere med trøtt 3-åring"]},
+  "19 · Saint-Tropez via direkte båt":{
+    long:"Saint-Tropez er den glamorøse legenden — yachthavn, kunstnerhistorie (Signac og Matisse malte her) og kjendis-glans. Bak den travle havnefronten ligger det ekte: fiskerkvarteret La Ponche med smale gater, Place des Lices med platantrær og petanque (marked tir + lør), og Citadellet på høyden med utsikt og påfugler. Ærlig: den svakeste dagsturen for nettopp deres familie (langt, varmt, mye glamour barna ikke bryr seg om) — men gjort riktig med båt er den fin. Se transport-feltet for anbefalt adkomst.",
+    plan:["09:00 — Kjør til Sainte-Maxime (gratis parkering Fourmi)","10:30 — Bateaux Verts shuttle 15 min over bukta","11:00 — La Ponche-kvarteret + Citadellet (før varmen)","12:30 — Lunsj Le Café (Place des Lices) + Tarte Tropézienne","14:30 — Barbarac-is + shuttle tilbake","17:00 — Hjem (fleksibel retur med shuttle)"]},
+  "20 · Port Grimaud + Sainte-Maxime":{
+    long:"Et roligere, mer barnevennlig alternativ i Saint-Tropez-bukta. Port Grimaud er en moderne «lille Venezia» fra 1960-tallet bygget med kanaler i stedet for gater og fargede hus — en guidet elbåt-tur i kanalene er ofte et større hit for barn enn Saint-Tropez selv. Familiebyen Sainte-Maxime på nordsiden er avslappet, og herfra går shuttle over til Saint-Tropez hvis dere vil krysse. Lavt stress, mye vann.",
+    plan:["09:30 — Kjør til Sainte-Maxime (parker gratis)","10:30 — Shuttle til Port Grimaud","11:00 — Kanalbåt-tur (flatt, gøy for 3-åring)","12:30 — Lunsj kanalside (Lily's)","14:30 — Evt. shuttle til Saint-Tropez (Barbarac-is) eller bli i Sainte-Maxime","17:00 — Hjem","NB — Ikke på lørdag (trafikk)"]},
+  "21 · Verdon-canyon + turkis innsjø":{
+    long:"Gorges du Verdon er Europas dypeste canyon — opptil 700 m vertikale kalksteinsvegger i et urørt fjellandskap. Ved inngangen ligger den turkise Lac de Sainte-Croix, der dere kan padle pedalo eller kano RETT INN i canyonmunningen mellom de stupbratte veggene — det ikoniske, ikke-kopierbare Verdon-bildet, og helt trygt for barn. Landsbyen Moustiers-Sainte-Marie henger i fjellsiden med en foss og en forgylt stjerne på en 227 m kjetting over kløften. Ærlig: 2–2,5 t hver vei — en lang, men magisk dag.",
+    plan:["07:30 — Start fra Cannes (tidlig — lang kjøretur)","10:00 — Pont du Galetas: pedalo/kano (book online, før folketoppen)","12:00 — Bading + picnic / Snack de l'Étoile ved bryggen","14:00 — Moustiers-Sainte-Marie (landsby + stjerne, is hos L'Étoile Givrée)","16:00 — Kjør hjemover (hopp over Route des Crêtes — svimlende stup)","18:30 — Hjemme"]},
+  "22 · Verdon over to dager (overnatting)":{
+    long:"Den anbefalte måten å gjøre Verdon på med små barn: del den lange kjøringen over to dager og slipp stresset. Dag 1 kjører dere opp på ettermiddagen, sjekker inn nær Moustiers og rusler landsbyen i kveldslys. Dag 2 tar dere lavendelen på Valensole-platået i morgenlys (kjøligst, færrest folk, og dere treffer blomsten før dagens varme), padler ved Pont du Galetas midt på dagen, og kjører hjem på ettermiddagen.",
+    plan:["Dag 1 · 15:00 — Kjør opp, innsjekk nær Moustiers","Dag 1 · 18:00 — Moustiers landsby + middag Côté Jardin","Dag 2 · 07:30 — Valensole-lavendel i morgenlys","Dag 2 · 11:00 — Pont du Galetas: padling + bad","Dag 2 · 15:00 — Kjør hjemover","Tips — Book overnatting tidlig (høysesong)"]},
+  "23 · Aix-en-Provence halvdag":{
+    long:"Aix-en-Provence er Provences elegante universitetsby — Cézannes hjemby, med den platan-kantede Cours Mirabeau, plaskende fontener, daglige markeder og kjølige, skyggefulle smug. En ekte «by-dag» utenom kysten, med calissons (lokal mandelgodteri) og iskrem til barna. Ærlig: ~1,5–2 t hver vei vestover, så det blir en egen dag — men flatt og barnevennlig vel framme.",
+    plan:["09:00 — Kjør til Aix, parker i utkanten (P Rotonde)","10:30 — Cours Mirabeau + markedet (tir/tor/lør)","12:00 — Markedspicnic eller bistro i sidegatene","13:30 — Fontener, smug, calissons + iskrem","15:00 — Kjør hjemover"]},
+};
+
+// Wikipedia/Wikimedia titler for ekte foto (en først, fr som fallback). Steder uten oppslag beholder illustrasjon.
+const WIKI = {
+  "Île Saint-Honorat":"Lérins Abbey",
+  "Mougins":"Mougins",
+  "Musée Picasso + Vallauris":"Vallauris",
+  "Vieux Nice + Cours Saleya":"Cours Saleya",
+  "Colline du Château":"Promenade des Anglais",
+  "Musée Matisse (Cimiez)":"Musée Matisse (Nice)",
+  "Parc Phoenix":"Parc Phœnix",
+  "Marché Provençal":"Antibes",
+  "Phare + Sanctuaire de la Garoupe":"Phare de la Garoupe",
+  "Verrerie de Biot (glassverk)":"Biot, Alpes-Maritimes",
+  "Jazz à Juan «Off» (gratis)":"Jazz à Juan",
+  "Fort Carré":"Fort Carré",
+  "Monaco – Le Rocher & akvariet":"Musée océanographique de Monaco",
+  "Èze village":"Èze",
+  "Villefranche-sur-Mer":"Villefranche-sur-Mer",
+  "Villa Ephrussi de Rothschild":"Villa Ephrussi de Rothschild",
+  "Villa Kérylos":"Villa Kérylos",
+  "Grasse – lag din egen parfyme":"Grasse",
+  "Saint-Paul-de-Vence + Fondation Maeght":"Fondation Maeght",
+  "Chapelle du Rosaire (Matisse)":"Chapelle du Rosaire de Vence",
+  "Tourrettes-sur-Loup":"Tourrettes-sur-Loup",
+  "Gourdon":"Gourdon, Alpes-Maritimes",
+  "Coaraze":"Coaraze",
+  "Sainte-Agnès + Fort Maginot":"Sainte-Agnès, Alpes-Maritimes",
+  "Aix-en-Provence – Cours Mirabeau":"Aix-en-Provence",
+  "Saint-Tropez gamleby & La Ponche":"Saint-Tropez",
+  "Gassin & Ramatuelle":"Gassin",
+  "Port Grimaud («Lille Venezia»)":"Port Grimaud",
+  "Pont du Galetas / Lac de Sainte-Croix":"Lac de Sainte-Croix",
+  "Moustiers-Sainte-Marie":"Moustiers-Sainte-Marie",
+  "Valensole-platået (lavendel)":"Valensole",
+  // mat / landemerker
+  "Le Suquet (gamlebyen)":"Le Suquet",
+  "Marché Forville":"Cannes",
+  "Sénéquier":"Saint-Tropez",
+};
+
+const ALL = [
+  ...PERLER.map(x=>({...x, cat:"perle"})),
+  ...MAT.map(x=>({...x, cat:"mat"})),
+  ...MODULER.map(x=>({...x, cat:"modul"})),
+].map((x,i)=>({...x, id:i, wiki:WIKI[x.n]||null}));
+const byName = {}; ALL.forEach(x=>{ byName[x.n]=x; });
+
+// Ukesplan — fleksible dagforslag (trykk på en dagstur for å åpne den)
+const WEEK = [
+  {day:"Man",date:"13. juli",tag:"Ankomst",title:"Ankomst kl. 19 — slå dere til ro",
+   note:"Hent leiebil og handle litt. Eventuelt en kort kveldstur i Le Suquet og middag i Cannes.",mods:["2 · Cannes til fots"]},
+  {day:"Tir",date:"14. juli",tag:"Nasjonaldag",title:"Rolig dag + fyrverkeri",
+   note:"Museer i Nice og Chapelle Matisse er stengt tirsdag. Ta en øydag eller Cannes til fots, lang siesta, og avslutt med piknik på Croisette + fyrverkeri ca. kl. 22 (trykk på kortet for plan).",mods:["1 · Lérins-øydag","2 · Cannes til fots","14. juli – fyrverkeri i Cannes"]},
+  {day:"Ons",date:"15. juli",tag:"Nice",title:"Nice — marked, socca og gamleby",
+   note:"Tog ~35 min. Bading hjemme om ettermiddagen.",mods:["5 · Vieux Nice — marked & socca","7 · Parc Phoenix + Promenade"]},
+  {day:"Tor",date:"16. juli",tag:"Øst",title:"Antibes/Jazz eller Monaco",
+   note:"Velg én. Jazz Off-konsert i Juan om kvelden (gratis, 19:15).",mods:["8 · Antibes gamleby + Picasso","10 · Juan-les-Pins + Jazz Off","12 · Monaco-dagen"]},
+  {day:"Fre",date:"17. juli",tag:"Kornisjene",title:"Kornisjene øst eller Villa Ephrussi",
+   note:"Tog/buss østover. Ta Èze før kl. 10 for å unngå folkemengdene.",mods:["13 · Kornisjene øst: Èze + Villefranche","14 · Villa Ephrussi + Villefranche-bad"]},
+  {day:"Lør",date:"18. juli",tag:"Bakland",title:"Parfyme, kunst eller fjellandsbyer",
+   note:"Unngå Saint-Tropez på lørdag (trafikk). Chapelle Matisse er stengt søndag/mandag — ta den i dag hvis dere vil.",mods:["15 · Parfyme i Grasse","16 · Kunst i Saint-Paul & Vence","17 · Fjellandsbyer & juv"]},
+  {day:"Søn",date:"19. juli",tag:"Fleksibel",title:"Rolig dag eller storutflukt",
+   note:"Lett dag ved Cap d'Antibes/Cap-Ferrat, eller storutflukt til Verdon hvis energien er på topp (start 07:30).",mods:["9b · Cap d'Antibes + La Plage du Cap","14b · Cap-Ferrat + Èze light","21 · Verdon-canyon + turkis innsjø"]},
+  {day:"Man",date:"20. juli",tag:"Avreise",title:"Avreise fra Nice kl. 10:30",
+   note:"Pakk og dra tidlig. Eventuelt et siste stopp på Marché Forville før dere kjører.",mods:[]},
+];
+function transIcon(x){ const t=(x.trans||"")+" "+(x.a||""); let s="";
+  if(/båt|ferge|shuttle/i.test(t))s+="⛴️";
+  if(/tog/i.test(t))s+="🛤️";
+  if(/bil/i.test(t))s+="🚗";
+  if(/fots/i.test(t))s+="🚶";
+  return s||"📍"; }
+function openDetailByName(n){ const x=byName[n]; if(x) openDetail(x.id); }
+
+// Bestillingssjekkliste
+const CHECKLIST = [
+  {group:"📌 Book i god tid (kan selge ut)", items:[
+    "Parfyme-atelier i Grasse (Galimard/Molinard)",
+    "Pedalo/kano ved Pont du Galetas (boutique.moustiers.fr)",
+    "Verdon-overnatting (hvis to-dagers utflukt)",
+    "Saint-Tropez: direkte båt eller Bateaux Verts shuttle",
+    "Middag Aux Bons Enfants — kun kontant (Cannes)",
+    "Middag L'Escalinada (Nice, lukket onsdag)",
+    "Middag L'Auberge des Maures (Saint-Tropez)",
+    "Sainte-Agnès Fort Maginot (SMS-reservasjon 48 t før)",
+  ]},
+  {group:"✅ Bekreft åpningstider nær avreise", items:[
+    "Villa Ephrussi åpent 11. juli (motstridende kilder)",
+    "Jardin Exotique Monaco — juli-tider/pris",
+    "Marché Provençal Antibes + Garoupe-fyret",
+    "La Tonnelle (Saint-Honorat) — gjenåpning 2026",
+    "Le Jardin (Cannes) — adresse / hvilket sted",
+    "Ring små restauranter 2–3 dager før (congés)",
+  ]},
+  {group:"🌡️ Vær & sesong", items:[
+    "Lavendel-status Valensole (sjekk uke 1–2 juli)",
+    "Brannfare/veistenginger Verdon (var.gouv.fr)",
+    "Vind for Cap d'Antibes-sti og strender",
+  ]},
+  {group:"🎒 Pakke & hverdag", items:[
+    "Kontanter (Aux Bons Enfants, markeder)",
+    "Bæremeis for landsbyer (brostein/trapper)",
+    "Solhatt, solkrem og vannflasker",
+    "14. juli: piknik + fyrverkeri på Croisette",
+  ]},
+];
+let checks = loadChecks();
+const CHECKTOTAL = CHECKLIST.reduce((a,g)=>a+g.items.length,0);
+function loadChecks(){ try{ return JSON.parse(localStorage.getItem("rivcheck")||"[]"); }catch(e){ return []; } }
+function saveChecks(){ try{ localStorage.setItem("rivcheck", JSON.stringify(checks)); }catch(e){} }
+function toggleCheck(inp){
+  const it=inp.parentElement.dataset.it; const i=checks.indexOf(it);
+  if(inp.checked && i<0) checks.push(it); else if(!inp.checked && i>=0) checks.splice(i,1);
+  saveChecks();
+  const c=document.getElementById("count"); if(c) c.textContent=checks.length+"/"+CHECKTOTAL+" gjort";
+}
+
+/* ---------------- STATE ---------------- */
+let state = {cat:"alle", zone:"alle"};
+let favs = loadFavs();
+let imgCache = {};
+let detailStack = [];
+let currentId = null;
+
+function loadFavs(){ try{ return JSON.parse(localStorage.getItem("rivfavs")||"[]"); }catch(e){ return []; } }
+function saveFavs(){ try{ localStorage.setItem("rivfavs", JSON.stringify(favs)); }catch(e){} }
+
+/* ---------------- IMAGES (Wikipedia REST, CORS-enabled) ---------------- */
+async function fetchThumb(title){
+  if(title in imgCache) return imgCache[title];
+  for(const lang of ["en","fr"]){
+    try{
+      const r = await fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
+      if(!r.ok) continue;
+      const d = await r.json();
+      const src = d && d.thumbnail && d.thumbnail.source;
+      if(src){ imgCache[title]=src; return src; }
+    }catch(e){}
+  }
+  imgCache[title]=""; return "";
+}
+async function hydrate(root){
+  (root||document).querySelectorAll("img.ph:not([data-done])").forEach(async im=>{
+    im.setAttribute("data-done","1");
+    const src = await fetchThumb(decodeURIComponent(im.dataset.title));
+    if(src){ im.onload=()=>im.classList.add("show"); im.onerror=()=>im.remove(); im.src=src; }
+    else im.remove();
+  });
+}
+function phImg(x){ return x.wiki ? `<img class="ph" data-title="${encodeURIComponent(x.wiki)}" alt="${x.n}">` : ""; }
+
+/* ---------------- MAPS ---------------- */
+function gmaps(x){
+  const place = (x.a||"").split("·")[0].trim();
+  const q = encodeURIComponent(`${x.n}, ${place}, France`);
+  return `https://www.google.com/maps/search/?api=1&query=${q}`;
+}
+
+/* ---------------- SVG SCENE (fallback) ---------------- */
+function scene(zone, seed){
+  const p = (ZONES[zone]||ZONES.cannes).pal;
+  const s = (seed||0)%3;
+  const sun = `<circle cx="${78-s*8}%" cy="32%" r="20" fill="#fff8d8" opacity=".85"/>`;
+  const tree = (x,y,sc,c)=>`<g transform="translate(${x},${y}) scale(${sc})"><rect x="-1.2" y="6" width="2.4" height="7" fill="#5b4632"/><polygon points="0,-10 8,8 -8,8" fill="${c}"/><polygon points="0,-3 6,10 -6,10" fill="${c}"/></g>`;
+  let trees="";
+  for(let i=0;i<4+s;i++){ const x=(20+i*70+s*15)%360; trees+=tree(x,150+(i%2)*8,.8+(i%3)*.25,p[4]); }
+  return `<svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="sk${zone}${s}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${p[0]}"/><stop offset="1" stop-color="${p[1]}"/></linearGradient></defs>
+    <rect width="360" height="200" fill="url(#sk${zone}${s})"/>${sun}
+    <path d="M0,${120+s*6} Q90,${90+s*8} 180,118 T360,110 V200 H0 Z" fill="${p[2]}" opacity=".95"/>
+    <path d="M0,145 Q120,${118+s*6} 240,146 T360,140 V200 H0 Z" fill="${p[3]}"/>${trees}
+    <path d="M0,172 Q120,158 240,172 T360,168 V200 H0 Z" fill="${p[4]}"/></svg>`;
+}
+
+/* ---------------- COVER ART ---------------- */
+document.getElementById("coverArt").innerHTML = `
+<svg viewBox="0 0 340 300" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="cs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdf6cf"/><stop offset="1" stop-color="#cfe8a6"/></linearGradient></defs>
+  <circle cx="170" cy="140" r="120" fill="url(#cs)"/><circle cx="245" cy="78" r="26" fill="#fff6cf" opacity=".9"/>
+  <path d="M30,200 Q110,150 190,196 T330,188 V300 H30 Z" fill="#7cc0a6"/>
+  <path d="M10,230 Q120,188 240,232 T350,224 V300 H10 Z" fill="#3f8f86"/>
+  <path d="M0,262 Q120,244 240,264 T340,258 V300 H0 Z" fill="#2c6b6e"/>
+  <g transform="translate(150,120) rotate(-12)"><rect x="-26" y="-34" width="52" height="74" rx="7" fill="#2f7a6e"/>
+   <rect x="-26" y="-34" width="52" height="74" rx="7" fill="none" stroke="#1f5b52" stroke-width="2"/>
+   <circle cx="0" cy="-4" r="15" fill="#cfe89a"/>
+   <path d="M-15,-4 H15 M0,-19 V11 M-10,-13 Q0,-4 -10,5 M10,-13 Q0,-4 10,5" stroke="#2f7a6e" stroke-width="1.4" fill="none"/>
+   <rect x="-20" y="22" width="40" height="8" rx="2" fill="#f4d35e"/></g>
+  <g stroke="#3f8f86" stroke-width="2" stroke-dasharray="3 6" fill="none" opacity=".7"><path d="M70,90 Q150,40 250,86"/></g>
+  <g transform="translate(74,86)"><rect x="-16" y="-14" width="32" height="28" rx="3" fill="#fbf9f0" stroke="#3f8f86" stroke-width="2"/>
+   <path d="M-13,8 L-3,-4 L4,4 L9,-2 L13,6 Z" fill="#7cc0a6"/><circle cx="6" cy="-7" r="3" fill="#f4d35e"/></g>
+</svg>`;
+
+/* ---------------- CHIPS / FILTERS ---------------- */
+const CATS = [["alle","Alle"],["perle","Perler"],["mat","Mat"],["modul","Dagsturer"]];
+const ZONELIST = [["alle","Alle soner"],["cannes","Cannes"],["nice","Nice"],["antibes","Antibes/Juan"],["monaco","Monaco/Øst"],["grasse","Grasse/Bakland"],["tropez","Saint-Tropez"],["verdon","Verdon"]];
+
+function buildChips(){
+  document.getElementById("catChips").innerHTML = CATS.map(([v,l])=>`<div class="chip ${state.cat===v?'active':''}" onclick="setCat('${v}')">${l}</div>`).join("");
+  document.getElementById("zoneChips").innerHTML = ZONELIST.map(([v,l])=>`<div class="chip ${state.zone===v?'active':''}" onclick="setZone('${v}')">${l}</div>`).join("");
+}
+function setCat(v){ state.cat=v; syncNav(); buildChips(); render(); }
+function setZone(v){ state.zone=v; buildChips(); render(); }
+function navCat(v){ go('home'); state.cat=v; syncNav(); buildChips(); render(); window.scrollTo(0,0); }
+function syncNav(){ document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active", b.dataset.cat===state.cat)); }
+
+function freshBadge(f){ return `<span class="badge">${f==="bekreftet"?"✓ Bekreftet":f==="sannsynlig"?"~ Sjekk nær":"? Usikkert"}</span>`; }
+function kidPill(k){ const m={ja:"3-åring: Ja",delvis:"3-åring: Delvis",nei:"3-åring: Nei"}; return `<span class="pill ${k}">${m[k]||m.delvis}</span>`; }
+
+/* ---------------- RENDER LIST ---------------- */
+function render(){
+  const grid=document.getElementById("grid");
+  const tips=document.getElementById("tips");
+  if(tips) tips.style.display = (state.cat==="alle"||state.cat==="uke")?"block":"none";
+  grid.classList.toggle("week", state.cat==="uke"||state.cat==="sjekk");
+
+  if(state.cat==="sjekk"){
+    document.getElementById("secTitle").textContent="Bestillingssjekkliste";
+    document.getElementById("count").textContent=checks.length+"/"+CHECKTOTAL+" gjort";
+    grid.innerHTML = CHECKLIST.map(g=>`
+      <div class="dayc">
+        <div class="dtitle">${g.group}</div>
+        ${g.items.map(it=>`<label class="chk" data-it="${it}"><input type="checkbox" ${checks.includes(it)?'checked':''} onchange="toggleCheck(this)"><span>${it}</span></label>`).join("")}
+      </div>`).join("");
+    return;
+  }
+
+  if(state.cat==="uke"){
+    document.getElementById("secTitle").textContent="Ukesplan";
+    document.getElementById("count").textContent=WEEK.length+" dager";
+    grid.innerHTML = WEEK.map(d=>`
+      <div class="dayc">
+        <div class="dayhead"><span class="dnum">${d.day}</span><span class="ddate">${d.date}</span>${d.tag?`<span class="dtag">${d.tag}</span>`:''}</div>
+        <div class="dtitle">${d.title}</div>
+        ${d.note?`<p class="dnote">${d.note}</p>`:''}
+        ${d.mods&&d.mods.length?`<div class="dmods">${d.mods.map(m=>`<span class="dmod" data-n="${m}" onclick="openDetailByName(this.dataset.n)">${m} ›</span>`).join("")}</div>`:''}
+      </div>`).join("");
+    return;
+  }
+
+  const q=(document.getElementById("q").value||"").toLowerCase().trim();
+  let items;
+  if(state.cat==="fav"){ items = ALL.filter(x=>favs.includes(x.id)); }
+  else { items = ALL.filter(x=> state.cat==="alle"||x.cat===state.cat); }
+  if(state.zone!=="alle") items=items.filter(x=>x.z===state.zone);
+  if(q) items=items.filter(x=> (x.n+" "+x.a+" "+(x.why||"")).toLowerCase().includes(q));
+
+  const titleMap={alle:"Alt i biblioteket",perle:"Perler",mat:"Matkart",modul:"Dagsturer",fav:"Dine favoritter"};
+  document.getElementById("secTitle").textContent = titleMap[state.cat]||"Anbefalt";
+  document.getElementById("count").textContent = items.length+" steder";
+
+  if(!items.length){
+    grid.innerHTML=`<div class="empty" style="grid-column:1/3">${state.cat==="fav"?"Ingen favoritter ennå. Trykk ♡ på et kort for å lagre det her.":"Ingen treff. Prøv et annet søk eller filter."}</div>`;
+    return;
+  }
+  grid.innerHTML = items.map(x=>`
+    <div class="card" onclick="openDetail(${x.id})">
+      <div class="thumb">${scene(x.z,x.id)}${phImg(x)}${freshBadge(x.f)}
+        <div class="fav" onclick="event.stopPropagation();toggleFav(${x.id})">${favs.includes(x.id)?'❤️':'♡'}</div>
+      </div>
+      <div class="body"><h3>${x.n}</h3><div class="loc">📍 ${x.a}</div>
+        <div class="meta">${x.cat==="mat"?`<span class="price">${x.p}</span>`:(x.cat==="modul"?`<span class="tico">${transIcon(x)}</span>`:'')+kidPill(x.k)}<span style="font-size:11px;color:var(--ink-soft)">${ZONES[x.z].name}</span></div>
+      </div></div>`).join("");
+  hydrate(grid);
+}
+
+/* ---------------- DETAIL ---------------- */
+function xrow(x){
+  return `<div class="xrow" onclick="openDetail(${x.id})">
+    <div class="xth">${scene(x.z,x.id)}${phImg(x)}</div>
+    <div class="xinfo"><h4>${x.n}</h4>
+      <div class="xsub">${x.cat==="mat"?`<span class="price" style="font-size:13px">${x.p}</span>`:`<span class="mini ${x.k}">3-åring: ${x.k==='ja'?'Ja':x.k==='nei'?'Nei':'Delvis'}</span>`}
+        <span>${x.a}</span></div></div>
+    <div class="xchev">›</div></div>`;
+}
+
+function showDetail(id){
+  currentId=id;
+  const x=ALL.find(i=>i.id===id);
+  document.getElementById("dHero").innerHTML =
+    scene(x.z,x.id)+phImg(x)+
+    `<button class="d-back" onclick="back()">←</button>
+     <button class="d-fav" onclick="toggleFavFromDetail()">${favs.includes(id)?'❤️':'♡'}</button>`;
+
+  let tags = `<span class="tag fresh">${x.f==="bekreftet"?"✓ Bekreftet juli 2026":x.f==="sannsynlig"?"~ Sannsynlig – sjekk nær avreise":"? Usikkert – må bekreftes"}</span>
+              <span class="tag">${ZONES[x.z].name}</span>`;
+  if(x.cat!=="mat") tags += ` <span class="tag ${x.k==='nei'?'warn':''}">3-åring: ${x.k==='ja'?'Ja':x.k==='nei'?'Nei':'Delvis'}</span>`;
+  else tags += ` <span class="tag">Pris ${x.p}</span>`;
+
+  let blocks="";
+  if(x.cat==="modul"){
+    const lk = LINKS[x.n]||{see:[],eat:[]};
+    const md = MODDETAIL[x.n]||{};
+    const zp = lk.see.map(n=>byName[n]).filter(Boolean);
+    const zm = lk.eat.map(n=>byName[n]).filter(Boolean);
+    const planHTML = (md.plan||[]).map(s=>{const i=s.indexOf(" — ");const t=i>0?s.slice(0,i):"";const d=i>0?s.slice(i+3):s;return `<div class="tlrow"><span class="tlt">${t}</span><span class="tld">${d}</span></div>`}).join("");
+    blocks += `
+      <div class="kvrow">
+        <div class="kv"><div class="k">Transport</div><div class="v">${x.trans}</div></div>
+        <div class="kv"><div class="k">Intensitet</div><div class="v">${x.intensitet}</div></div>
+        <div class="kv"><div class="k">Kostnad (5 pers)</div><div class="v">${x.kost}</div></div>
+        <div class="kv"><div class="k">3-åring</div><div class="v">${x.k==='ja'?'Ja':x.k==='nei'?'Nei':'Delvis'}</div></div>
+      </div>
+      ${md.long?`<div class="d-block"><h3>Om turen</h3><p>${md.long}</p></div>`:''}
+      <div class="d-block"><h3>Slik gjør du dagen</h3><p>${x.why}</p></div>
+      ${planHTML?`<div class="d-block"><h3>Forslag til tidsskjema</h3><div class="tl">${planHTML}</div></div>`:''}
+      <div class="d-block"><h3>Mat-meny (forslag)</h3><p>${x.mat}</p></div>
+      <div class="d-block"><h3>Pairer / kolliderer</h3><p>${x.pair}</p></div>
+      <div class="d-block"><h3>Severdigheter på denne turen (${zp.length})</h3>${zp.length?zp.map(xrow).join(""):'<p class="muted" style="font-size:13px">Ingen koblet ennå.</p>'}</div>
+      <div class="d-block"><h3>Spisesteder på denne turen (${zm.length})</h3>${zm.length?zm.map(xrow).join(""):'<p class="muted" style="font-size:13px">Ingen koblet ennå.</p>'}</div>`;
+  } else if(x.cat==="mat"){
+    blocks += `<div class="d-block"><h3>Hvorfor ekte</h3><p>${x.why}</p></div>`;
+  } else {
+    blocks += `
+      <div class="d-block"><h3>Hvorfor verdt det</h3><p>${x.why}</p></div>
+      <div class="d-block"><h3>Slik gjør du det riktig</h3><p>${x.tips}</p></div>
+      <div class="d-block"><h3>Praktisk</h3><p>${x.pr}</p></div>`;
+  }
+
+  // actions
+  let actions = `<a class="d-src" href="${x.u}" target="_blank" rel="noopener">Åpne kilde ↗</a>`;
+  if(x.cat!=="modul") actions += `<a class="d-src light" href="${gmaps(x)}" target="_blank" rel="noopener">🗺️ Google Maps</a>`;
+
+  document.getElementById("dSheet").innerHTML = `
+    <div class="d-tagrow">${tags}</div>
+    <div class="d-title"><h1>${x.n}</h1></div>
+    <div class="d-loc">📍 ${x.a}</div>
+    ${blocks}
+    <div class="d-actions">${actions}</div>`;
+  hydrate(document.getElementById("detail"));
+}
+
+function openDetail(id){
+  detailStack.push(id);
+  showDetail(id);
+  const d=document.getElementById("detail");
+  d.classList.add("active"); d.scrollTop=0;
+}
+function back(){
+  detailStack.pop();
+  if(detailStack.length){ showDetail(detailStack[detailStack.length-1]); document.getElementById("detail").scrollTop=0; }
+  else { document.getElementById("detail").classList.remove("active"); }
+}
+function toggleFav(id){ const i=favs.indexOf(id); if(i>=0) favs.splice(i,1); else favs.push(id); saveFavs(); render(); }
+function toggleFavFromDetail(){ if(currentId!=null){ toggleFav(currentId);
+  document.querySelector("#dHero .d-fav").textContent = favs.includes(currentId)?'❤️':'♡'; } }
+
+/* ---------------- NAV ---------------- */
+function go(screen){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(screen).classList.add("active");
+  document.getElementById("nav").classList.toggle("hidden", screen==="cover");
+  if(screen==="home"){ buildChips(); render(); }
+}
+document.getElementById("nav").classList.add("hidden");
+buildChips();
+render();
+</script>
+</body>
+</html>
