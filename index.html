@@ -77,7 +77,7 @@
   img.ph.show{opacity:1}
 
   /* DETAIL */
-  #detail{position:absolute; inset:0; background:var(--cream); z-index:30; display:none; flex-direction:column; overflow-y:auto; -webkit-overflow-scrolling:touch}
+  #detail{position:fixed; top:0; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:460px; background:var(--cream); z-index:30; display:none; flex-direction:column; overflow-y:auto; -webkit-overflow-scrolling:touch}
   #detail.active{display:flex}
   .d-hero{height:240px; position:relative}
   .d-hero svg{width:100%;height:100%;display:block}
@@ -1121,8 +1121,10 @@ function toggleCheck(inp){
 let state = {cat:"alle", zone:"alle"};
 let favs = loadFavs();
 let imgCache = {};
-let detailStack = [];
 let currentId = null;
+// navigasjonshistorikk for frem/tilbake (sveiping)
+let hist = [];     // hver entry: {cat,zone,scrollY} eller {detail:id}
+let hi = -1;       // peker i historikken
 
 function loadFavs(){ try{ return JSON.parse(localStorage.getItem("rivfavs")||"[]"); }catch(e){ return []; } }
 function saveFavs(){ try{ localStorage.setItem("rivfavs", JSON.stringify(favs)); }catch(e){} }
@@ -1200,9 +1202,9 @@ function buildChips(){
   document.getElementById("catChips").innerHTML = CATS.map(([v,l])=>`<div class="chip ${state.cat===v?'active':''}" onclick="setCat('${v}')">${l}</div>`).join("");
   document.getElementById("zoneChips").innerHTML = ZONELIST.map(([v,l])=>`<div class="chip ${state.zone===v?'active':''}" onclick="setZone('${v}')">${l}</div>`).join("");
 }
-function setCat(v){ state.cat=v; syncNav(); buildChips(); render(); }
-function setZone(v){ state.zone=v; buildChips(); render(); }
-function navCat(v){ go('home'); state.cat=v; syncNav(); buildChips(); render(); window.scrollTo(0,0); }
+function setCat(v){ navTo({cat:v, zone:state.zone}); }
+function setZone(v){ navTo({cat:state.cat, zone:v}); }
+function navCat(v){ go('home'); navTo({cat:v, zone:state.zone}); }
 function syncNav(){ document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active", b.dataset.cat===state.cat)); }
 
 function freshBadge(f){ return `<span class="badge">${f==="bekreftet"?"✓ Bekreftet":f==="sannsynlig"?"~ Sjekk nær":"? Usikkert"}</span>`; }
@@ -1331,17 +1333,26 @@ function showDetail(id){
   hydrate(document.getElementById("detail"));
 }
 
-function openDetail(id){
-  detailStack.push(id);
-  showDetail(id);
+/* ---------- HISTORIKK / FREM-TILBAKE ---------- */
+function applyEntry(e, restore){
   const d=document.getElementById("detail");
-  d.classList.add("active"); d.scrollTop=0;
+  if(e.detail!==undefined){
+    showDetail(e.detail);
+    d.classList.add("active"); d.scrollTop=0;
+  } else {
+    d.classList.remove("active");
+    state.cat=e.cat; if(e.zone!==undefined) state.zone=e.zone;
+    syncNav(); buildChips(); render();
+    window.scrollTo(0, restore ? (e.scrollY||0) : 0);
+  }
 }
-function back(){
-  detailStack.pop();
-  if(detailStack.length){ showDetail(detailStack[detailStack.length-1]); document.getElementById("detail").scrollTop=0; }
-  else { document.getElementById("detail").classList.remove("active"); }
-}
+function saveScroll(){ if(hi>=0 && hist[hi] && hist[hi].detail===undefined) hist[hi].scrollY=window.scrollY; }
+function navTo(e){ saveScroll(); applyEntry(e,false); hist=hist.slice(0,hi+1); hist.push(e); hi=hist.length-1; }
+function goBack(){ if(hi>0){ saveScroll(); hi--; applyEntry(hist[hi],true); } }
+function goForward(){ if(hi<hist.length-1){ saveScroll(); hi++; applyEntry(hist[hi],true); } }
+
+function openDetail(id){ navTo({detail:id}); }
+function back(){ goBack(); }
 function toggleFav(id){ const i=favs.indexOf(id); if(i>=0) favs.splice(i,1); else favs.push(id); saveFavs(); render(); }
 function toggleFavFromDetail(){ if(currentId!=null){ toggleFav(currentId);
   document.querySelector("#dHero .d-fav").textContent = favs.includes(currentId)?'❤️':'♡'; } }
@@ -1351,8 +1362,23 @@ function go(screen){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(screen).classList.add("active");
   document.getElementById("nav").classList.toggle("hidden", screen==="cover");
-  if(screen==="home"){ buildChips(); render(); }
+  if(screen==="home"){
+    buildChips(); render();
+    if(hist.length===0){ hist=[{cat:state.cat, zone:state.zone}]; hi=0; }  // init historikk
+  }
 }
+
+/* ---------- SVEIP: høyre = tilbake, venstre = frem ---------- */
+let _sx=0,_sy=0,_st=0;
+document.addEventListener('touchstart',e=>{const t=e.changedTouches[0];_sx=t.clientX;_sy=t.clientY;_st=Date.now();},{passive:true});
+document.addEventListener('touchend',e=>{
+  const t=e.changedTouches[0], dx=t.clientX-_sx, dy=t.clientY-_sy, dt=Date.now()-_st;
+  if(dt>700) return;                                  // for sakte
+  if(Math.abs(dx)<70 || Math.abs(dx)<Math.abs(dy)*1.7) return;  // ikke horisontalt nok
+  if(e.target.closest && e.target.closest('.chips')) return;    // la chip-radene scrolle fritt
+  if(dx>0) goBack(); else goForward();
+},{passive:true});
+
 document.getElementById("nav").classList.add("hidden");
 buildChips();
 render();
