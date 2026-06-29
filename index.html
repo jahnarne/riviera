@@ -67,6 +67,8 @@
   .card .body h3{font-size:14.5px; line-height:1.2}
   .card .loc{display:flex; align-items:center; gap:4px; color:var(--ink-soft); font-size:11.5px; margin-top:5px}
   .card .meta{display:flex; align-items:center; justify-content:space-between; margin-top:8px}
+  .cone{font-size:11.5px; color:var(--ink-soft); line-height:1.4; margin-top:5px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+  .ctags{display:flex; gap:5px; align-items:center; flex-wrap:wrap; margin-top:7px}
   .pill{font-size:11px; font-weight:700; padding:3px 8px; border-radius:999px}
   .pill.ja{background:#dcefb6; color:#3b5a1e}
   .pill.delvis{background:#fbe7bd; color:#8a5a08}
@@ -105,16 +107,22 @@
   .kv .v{font-size:14px; font-weight:600; margin-top:3px}
 
   /* cross-link rows in modules */
-  .xrow{display:flex; align-items:center; gap:11px; padding:9px; border:1px solid var(--line); border-radius:14px; background:var(--cream2); margin-top:9px; cursor:pointer}
+  .xrow{display:flex; align-items:flex-start; gap:11px; padding:10px; border:1px solid var(--line); border-radius:14px; background:var(--cream2); margin-top:9px; cursor:pointer}
   .xrow:active{transform:translateY(1px)}
-  .xth{width:56px;height:56px;border-radius:11px;overflow:hidden;flex:0 0 auto;position:relative}
+  .xth{width:60px;height:60px;border-radius:11px;overflow:hidden;flex:0 0 auto;position:relative}
   .xth svg,.xth img{width:100%;height:100%;object-fit:cover;display:block}
   .xinfo{flex:1; min-width:0}
   .xinfo h4{margin:0;font-size:14px;font-family:var(--sans);font-weight:700;line-height:1.25}
-  .xinfo .xsub{font-size:11.5px;color:var(--ink-soft);margin-top:3px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-  .xchev{color:var(--ink-soft); font-size:20px; flex:0 0 auto}
+  .xone{font-size:12px;color:var(--ink-soft);line-height:1.4;margin-top:3px}
+  .xtags{display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-top:6px}
+  .xtag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:var(--green-soft);color:#3b5a1e;white-space:nowrap}
+  .xtag.price{font-family:var(--serif)}
+  .xtag.warn{background:#fbe7bd;color:#8a5a08}
+  .xchev{color:var(--ink-soft); font-size:20px; flex:0 0 auto; align-self:center}
   .mini{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px}
-  .mini.ja{background:#dcefb6;color:#3b5a1e}.mini.delvis{background:#fbe7bd;color:#8a5a08}.mini.nei{background:#f3cabf;color:#8a2c19}
+  .xtag.ja,.mini.ja{background:#dcefb6;color:#3b5a1e}
+  .xtag.delvis,.mini.delvis{background:#fbe7bd;color:#8a5a08}
+  .xtag.nei,.mini.nei{background:#f3cabf;color:#8a2c19}
 
   .nav{position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:460px; background:var(--cream2); border-top:1px solid var(--line); display:flex; justify-content:space-around; padding:10px 6px calc(10px + env(safe-area-inset-bottom)); z-index:25}
   .nav button{border:none; background:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; color:var(--ink-soft); font-size:9px; font-weight:600; padding:4px 3px; border-radius:12px}
@@ -130,6 +138,9 @@
 
   /* kart i dagstur */
   #modmap{height:230px; border-radius:14px; overflow:hidden; margin-top:8px; border:1px solid var(--line); background:#e8eee6}
+  #placemap{height:180px; border-radius:14px; overflow:hidden; margin-top:6px; border:1px solid var(--line); background:#e8eee6}
+  #bigmap{height:72vh; min-height:360px; border-radius:16px; overflow:hidden; border:1px solid var(--line); background:#e8eee6}
+  .maptgl{border:1px solid var(--green-deep); background:var(--green-soft); color:var(--ink); font-size:12px; font-weight:700; padding:6px 11px; border-radius:999px; cursor:pointer}
   .leaflet-container{font:inherit}
   .leaflet-popup-content{font-family:var(--sans); font-size:13px}
   .mpin{width:27px;height:27px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:14px}
@@ -197,7 +208,7 @@
     <div class="search"><span>🔍</span><input id="q" placeholder="Søk steder, mat, dagsturer…" oninput="render()"></div>
     <div class="chips" id="catChips"></div>
     <div class="chips" id="zoneChips"></div>
-    <div class="sec-label"><h2 id="secTitle">Anbefalt</h2><span id="count"></span></div>
+    <div class="sec-label"><h2 id="secTitle">Anbefalt</h2><div style="display:flex;gap:10px;align-items:center"><span id="count"></span><button id="mapToggle" class="maptgl" onclick="toggleMapView()">🗺️ Kart</button></div></div>
     <div class="grid" id="grid"></div>
     <div class="footer-note"><strong>Planen er fleksibel – bytt dager etter vær, energi og barnas humør.</strong><br>Ekte foto lastes fra Wikimedia når du er på nett; ellers vises stilisert illustrasjon.<br>Sjekk alltid åpningstider nær avreise. Trykk ♡ for å samle favoritter.</div>
   </section>
@@ -209,7 +220,7 @@
 
   <nav class="nav" id="nav">
     <button data-cat="alle" class="active" onclick="navCat('alle')"><span class="ic">🏠</span>Hjem</button>
-    <button data-cat="perle" onclick="navCat('perle')"><span class="ic">📍</span>Perler</button>
+    <button data-cat="perle" onclick="navCat('perle')"><span class="ic">📍</span>Steder</button>
     <button data-cat="mat" onclick="navCat('mat')"><span class="ic">🍴</span>Mat</button>
     <button data-cat="modul" onclick="navCat('modul')"><span class="ic">🗺️</span>Turer</button>
     <button data-cat="uke" onclick="navCat('uke')"><span class="ic">📅</span>Uke</button>
@@ -1052,11 +1063,12 @@ const WIKI = {
 };
 
 const GEO = {"Île Sainte-Marguerite": [43.5246, 7.0497], "Île Saint-Honorat": [43.5057, 7.0478], "Marché Forville": [43.55213, 7.01214], "Le Suquet (gamlebyen)": [43.55088, 7.00903], "Musée Bonnard": [43.57648, 7.01993], "Musée Picasso + Vallauris": [43.58002, 7.05321], "Mougins": [43.60089, 6.99635], "Parc de la Croix-des-Gardes": [43.5499, 6.9876], "14. juli – fyrverkeri i Cannes": [43.55068, 7.01766], "Vieux Nice + Cours Saleya": [43.69561, 7.2751], "Colline du Château": [43.69634, 7.28062], "Musée Matisse (Cimiez)": [43.71945, 7.27597], "Musée Chagall": [43.7088, 7.27106], "Parc Phoenix": [43.66835, 7.21763], "L'Atelier des Jouets": [43.69581, 7.27717], "Plage de la Réserve & Coco Beach": [43.68808, 7.29416], "Moulin à Huile Alziari": [43.69575, 7.26962], "Trésors Publics": [43.69632, 7.27609], "Palette & Tartelette": [43.68814, 7.29598], "Marché Provençal": [43.58072, 7.12761], "Phare + Sanctuaire de la Garoupe": [43.56434, 7.13272], "Plage de la Garoupe": [43.55455, 7.1357], "Verrerie de Biot (glassverk)": [43.62652, 7.10173], "Jazz à Juan «Off» (gratis)": [43.5687, 7.1077], "Fort Carré": [43.59034, 7.12762], "Monaco – Le Rocher & akvariet": [43.7308, 7.4256], "Èze village": [43.73024, 7.36136], "Villefranche-sur-Mer": [43.70423, 7.30997], "Villa Ephrussi de Rothschild": [43.6966, 7.3285], "Villa Kérylos": [43.70331, 7.33381], "Parfumerie Fragonard – Usine d'Èze": [43.72953, 7.36223], "Grasse – lag din egen parfyme": [43.6589, 6.9239], "Saint-Paul-de-Vence + Fondation Maeght": [43.70087, 7.1149], "Chapelle du Rosaire (Matisse)": [43.72751, 7.11286], "Tourrettes-sur-Loup": [43.7181, 7.03515], "Gourdon": [43.71953, 6.97878], "Cascades du Saut du Loup": [43.74788, 6.99818], "Coaraze (solur-landsbyen)": [43.86387, 7.29533], "Sainte-Agnès + Fort Maginot": [43.80041, 7.4615], "Château La Coste": [43.63662, 5.4199], "Aix-en-Provence – Cours Mirabeau": [43.52652, 5.44717], "Confiserie du Roy René (calissons)": [43.53071, 5.44747], "Saint-Tropez gamleby & La Ponche": [43.27346, 6.64117], "Gassin & Ramatuelle": [43.22915, 6.58548], "Port Grimaud («Lille Venezia»)": [43.27181, 6.58195], "Pont du Galetas / Lac de Sainte-Croix": [43.7861, 6.2249], "Moustiers-Sainte-Marie": [43.84601, 6.22176], "Valensole-platået (lavendel)": [43.83793, 5.98399], "Les Ruchers du Soleil": [43.83793, 5.98399], "Aux Bons Enfants": [43.55165, 7.01201], "Astoux et Brun": [43.55194, 7.01327], "Da Bouttau": [43.55145, 7.01113], "L'Amandier de Mougins": [43.60119, 6.99502], "Chez Pipo": [43.70007, 7.28548], "Chez René Socca": [43.70003, 7.27887], "Chez Thérésa": [43.69707, 7.27722], "BART (focaccia)": [43.69632, 7.27655], "L'Escalinada": [43.69965, 7.27896], "Fenocchio": [43.69732, 7.2763], "La Fougasserie": [43.6969, 7.2758], "Boulangerie Veziano": [43.57992, 7.12682], "Le Safranier": [43.5803, 7.127], "Le Brûlot": [43.58118, 7.12726], "Ti-Toques": [43.56957, 7.10983], "L'Auberge du Vieux Village": [43.62793, 7.09677], "Place d'Armes-markedet (Chez Roger)": [43.7346, 7.4203], "Le Cosmo": [43.70293, 7.31147], "Restaurant Béatrice": [43.6966, 7.3285], "Le Gazan": [43.6586, 6.9233], "Le Bistro du Peyra": [43.72286, 7.11285], "Sous les Pins": [43.70087, 7.1149], "Pizzeria du Saut du Loup": [43.74978, 6.99394], "L'École des Filles": [43.70124, 6.98826], "La Tarte Tropézienne": [43.27003, 6.64125], "Le Café": [43.26978, 6.64165], "L'Auberge des Maures": [43.25402, 6.65537], "Sénéquier": [43.27263, 6.63888], "Côté Jardin": [43.84358, 6.21816], "La Treille Muscate": [43.84723, 6.22235], "Snack de l'Étoile": [43.7861, 6.2249], "Auberge des Gorges du Loup": [43.7181, 7.03515], "Auberge du Soleil": [43.86387, 7.29533], "Lily's": [43.27181, 6.58195], "Chez Acchiardo": [43.6965, 7.27711], "La Plage du Cap": [43.55455, 7.1357], "Capitaine Cook": [43.68997, 7.33274], "La Differnnce": [43.51945, 7.04932], "Côté Jardin by Steve Moracchini": [43.55676, 7.01482], "Le Vauban": [43.58194, 7.12646], "Bistrot Margaux": [43.58679, 7.12867], "Les Garçons": [43.70389, 7.31182], "La Grignotière": [43.70339, 7.31119], "La Ponche": [43.27308, 6.64088], "Da Laura": [43.5519, 7.015], "Poissonnerie Forville": [43.5519, 7.0119], "Nivà Gelateria": [43.55228, 7.01532], "La Tonnelle": [43.50724, 7.0458], "Le Jardin": [43.5564, 7.02576], "La Petite Escale": [43.5808, 7.1262], "Jean-Luc Pelé": [43.55248, 7.01391], "Itinéraire Café": [43.553, 7.02009], "Les Délices de Mathias": [43.702, 7.266], "Boulangerie La Niçoise": [43.703, 7.266], "La Torref de Fersen": [43.58035, 7.12504], "Amarena": [43.58263, 7.12673], "Papilla": [43.56907, 7.11196], "Glacier Feracci": [43.70332, 7.31133], "Glacier de la Fontaine": [43.6951, 7.1222], "Barbarac": [43.27134, 6.6386], "L'Atelier du Glacier": [43.7345, 7.4218], "Les Glaces d'Andrea": [43.6589, 6.92391], "L'Étoile Givrée": [43.8468, 6.22207], "La Merenda": [43.69651, 7.27306], "Chez Davia": [43.69908, 7.26487], "The Original Focà": [43.69643, 7.27114], "Coquillages Bouchet": [43.69905, 7.28555], "La Bastide de Moustiers": [43.8409, 6.21803], "Le Plongeoir": [43.6917, 7.29122], "Lou Pilha Leva": [43.69815, 7.27668], "La Frenglish Boulangerie": [43.5802, 7.1255], "Jeanne": [43.58105, 7.12628], "La Colombe d'Or": [43.69875, 7.12214], "Cédric Grolet": [43.27173, 6.64057], "Good Mate Coffee": [43.55297, 7.02139], "Les Mimosas du Cours": [43.69561, 7.2751], "Les Petits Marchands": [43.69797, 7.28231], "Dry Restaurant & Cocktail Bar": [43.70318, 7.31186], "PhilCat": [43.55142, 7.01423], "Mitron Bakery": [43.7346, 7.4203], "Boulangerie L'Épi d'Or": [43.733, 7.422], "Aux Deux Frères": [43.27272, 6.64052], "Marcel et Cavazza": [43.27272, 6.64052], "Le Glacier du Roi": [43.52652, 5.44717]};
+const IMG = {"L'Atelier des Jouets": "https://niceshopping.fr/wp-content/uploads/2019/09/Atelier-des-jouets.jpg", "Moulin à Huile Alziari": "https://cdn.iris-etourism.io/uploads/nice/sizes/d52/96-105-30501216-800x520.webp", "Palette & Tartelette": "https://cdn.prod.website-files.com/682b3b35e3767517cae8ca89/687824a1708c3d93e5018b4c_543fa26baaeac9943ad0d3e389a1002d_Palette%20et%20Tartelette%20-%20Opengraph.jpg", "Plage de la Garoupe": "https://www.antibesjuanlespins.com/sites/antibes/files/styles/ogimage/public/page/21072016-20a0561.jpg?itok=1hebo1IA", "Cascades du Saut du Loup": "https://cascades-sautduloup.com/_media/img/xlarge/montage-02.jpg", "Les Ruchers du Soleil": "https://www.paysdemanosque.com/medias/images/prestataires/1007294-39997aaf947949a41c7593b9225723944f0b46c2.jpg", "Astoux et Brun": "http://static1.squarespace.com/static/66fe484d896631559edda6e3/t/68259db3f30f7667bb64600f/1743308940234/Astoux+and+Brun_Carousel-37.jpg?format=1500w", "L'Amandier de Mougins": "https://cdn.thefork.com/tf-lab/image/upload/w_520,h_520,c_fill,q_auto,f_auto/restaurant/9d8937f3-fd7b-4d6a-a2a5-65b0e331104b/bd71e7d1-593b-4b1e-914f-b77d20efd06e.jpg", "Chez Pipo": "https://www.chezpipo.fr/assets/img/interface/facebook-cover.jpg", "Chez Thérésa": "https://chez-theresa.fr/boutique-chez-theresa.webp", "Place d'Armes-markedet (Chez Roger)": "https://www.monaco-tribune.com/wp-content/uploads/2025/10/marche-condamine-travaux-amenagement-temporaire.jpeg", "Le Gazan": "https://www.gillespudlowski.com/wp-content/uploads/2012/04/Le_Gazan.jpg", "Pizzeria du Saut du Loup": "https://cascades-sautduloup.com/_media/img/xlarge/montage-02.jpg", "L'École des Filles": "https://cdn.thefork.com/tf-lab/image/upload/w_520,h_520,c_fill,q_auto,f_auto/restaurant/fe6679b3-b4e9-4a1a-8e34-14631606ff35/c1399923-108b-4a0a-8e2a-7db6b9644e00.jpg", "Le Café": "https://cdn.prod.website-files.com/6272e3022e287740c7327632/628e65ddf0a56855e7843b86_og-image.jpg", "L'Auberge des Maures": "https://assets.gaultmillau.com/assets/740d74cd-a5d2-40fe-82f4-376893690735/restaurant-auberge-des-maures-in-saint-tropez-gault-millau-690735.jpg?key=facebook&format=jpg", "Côté Jardin": "https://www.cotejardin-moustiers.fr/img/hero.jpg", "La Differnnce": "https://www.cannes-france.com/app/uploads/cannes-tourisme/2022/06/thumbs/6165/ratio_2_1/ou-manger-sur-les-iles-cannes-famille-2021-herve-fabre-044-1920x960.webp", "Côté Jardin by Steve Moracchini": "https://assets.gaultmillau.com/assets/688e41d0-96ee-4f84-9392-a01b3450499b/restaurant-cote-jardin-by-steve-moracchini-gault-millau-50499b.jpg?key=facebook&format=jpg", "Le Vauban": "https://ugc.zenchef.com/3/4/5/1/9/0/1/4/1/3/8/1445881600_351/ec8400873e536d889ebcbde94334d275.website.jpg", "Bistrot Margaux": "https://api.cloudly.space/resize/crop/1200/627/60/aHR0cHM6Ly9tZWRpYXMudG91cmlzbS1zeXN0ZW0uY29tLzQvMC84NDk0NTBfdGVycm9pcl92ZXJhbmRhLmpwZw==/image.jpg", "Les Garçons": "https://cdn.iris-etourism.io/uploads/nice/sizes/582/195-143-25595843-800x520.webp", "Da Laura": "https://api.cloudly.space/resize/crop/1200/627/60/aHR0cHM6Ly9zdGF0aWMuYXBpZGFlLXRvdXJpc21lLmNvbS9maWxlc3RvcmUvb2JqZXRzLXRvdXJpc3RpcXVlcy9pbWFnZXMvNjkvMzgvMzc0MzA4NTMuanBn/image.jpg", "Jean-Luc Pelé": "https://jeanluc-pele.com/wp-content/uploads/2025/09/creation_patisseries.jpg", "Amarena": "https://glacier-antibes-amarena.fr/assets/og-amarena.jpg", "Barbarac": "https://barbarac.fr/wp-content/uploads/2020/02/glace-barbarac-etallage.jpg", "L'Étoile Givrée": "https://static.apidae-tourisme.com/filestore/objets-touristiques/images/167/114/33583783-diaporama.jpg", "Chez Davia": "https://ugc.zenchef.com/3/6/0/3/1/5/1/5/1/3/3/3/3/1671030381_361/108fca34f316c0be1bf3dd0fab690247.website.jpg", "The Original Focà": "https://static.tildacdn.net/tild3534-6432-4739-a563-666139616263/2024-05-11_21-29-12.png", "Le Plongeoir": "https://www.leplongeoir.com/wp-content/uploads/elementor/thumbs/BAIGNEUSE-2-BLEU-NUIT-pn09xn1x707vtlrk1hts6bupoji2bcmi3pseuh8q9s.png", "PhilCat": "https://media-cdn.tripadvisor.com/media/photo-w/09/87/1a/f5/philcat.jpg", "Boulangerie L'Épi d'Or": "https://media-cdn.tripadvisor.com/media/photo-m/1280/19/f1/d0/33/photo0jpg.jpg"};  /* fylles med foto-URL-er (og:image) per sted */
 const ALL = [
   ...PERLER.map(x=>({...x, cat:"perle"})),
   ...MAT.map(x=>({...x, cat:"mat"})),
   ...MODULER.map(x=>({...x, cat:"modul"})),
-].map((x,i)=>({...x, id:i, wiki:WIKI[x.n]||null, ll:(GEO[x.n]||null)}));
+].map((x,i)=>({...x, id:i, wiki:WIKI[x.n]||null, ll:(GEO[x.n]||null), img:(IMG[x.n]||null)}));
 const byName = {}; ALL.forEach(x=>{ byName[x.n]=x; });
 
 // Ukesplan — fleksible dagforslag (trykk på en dagstur for å åpne den)
@@ -1137,6 +1149,36 @@ async function buildModMap(stops){
   }
 }
 
+// lite kart på et enkelt sted (severdighet/restaurant)
+let _pmap=null;
+function buildPlaceMap(x){
+  const el=document.getElementById("placemap"); if(!el) return;
+  if(typeof L==="undefined"||!x.ll){ el.innerHTML="<div style='padding:14px;font-size:12px;color:#777'>Kart utilgjengelig.</div>"; return; }
+  if(_pmap){ try{_pmap.remove();}catch(e){} _pmap=null; }
+  _pmap=L.map(el,{scrollWheelZoom:false}).setView(x.ll,15);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(_pmap);
+  L.marker(x.ll,{icon:markerIcon(x)}).addTo(_pmap);
+  setTimeout(()=>{ try{_pmap.invalidateSize();}catch(e){} },120);
+}
+// stort kart med alle (filtrerte) steder
+let _bmap=null;
+function buildBigMap(items){
+  const el=document.getElementById("bigmap"); if(!el) return;
+  if(typeof L==="undefined"){ el.innerHTML="<div style='padding:16px;color:#777'>Kart krever internett.</div>"; return; }
+  if(_bmap){ try{_bmap.remove();}catch(e){} _bmap=null; }
+  _bmap=L.map(el).setView([43.6,7.0],9);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(_bmap);
+  const pts=[];
+  items.forEach(s=>{ if(!s.ll) return; const safe=s.n.replace(/'/g,"\\'");
+    const kind=s.cat!=="mat"?"Severdighet":(isIce(s)?"Iskrem":"Spisested");
+    L.marker(s.ll,{icon:markerIcon(s)}).addTo(_bmap).bindPopup(`<b>${s.n}</b><br><span style="color:#777">${kind} · ${ZONES[s.z].name}</span><br><a href="#" onclick="openDetailByName('${safe}');return false;">Åpne ›</a>`);
+    pts.push(s.ll);
+  });
+  if(pts.length){ try{ _bmap.fitBounds(pts,{padding:[30,30],maxZoom:14}); }catch(e){} }
+  setTimeout(()=>{ try{_bmap.invalidateSize();}catch(e){} },120);
+}
+function toggleMapView(){ state.mapView=!state.mapView; render(); }
+
 // Bestillingssjekkliste
 const CHECKLIST = [
   {group:"📌 Book i god tid (kan selge ut)", items:[
@@ -1181,7 +1223,7 @@ function toggleCheck(inp){
 }
 
 /* ---------------- STATE ---------------- */
-let state = {cat:"alle", zone:"alle"};
+let state = {cat:"alle", zone:"alle", mapView:false};
 let favs = loadFavs();
 let imgCache = {};
 let currentId = null;
@@ -1214,7 +1256,11 @@ async function hydrate(root){
     else im.remove();
   });
 }
-function phImg(x){ return x.wiki ? `<img class="ph" data-title="${encodeURIComponent(x.wiki)}" alt="${x.n}">` : ""; }
+function phImg(x){
+  if(x.img) return `<img class="ph" src="${x.img}" alt="${x.n}" referrerpolicy="no-referrer" onload="this.classList.add('show')" onerror="this.remove()">`;
+  if(x.wiki) return `<img class="ph" data-title="${encodeURIComponent(x.wiki)}" alt="${x.n}">`;
+  return "";
+}
 
 /* ---------------- MAPS ---------------- */
 function gmaps(x){
@@ -1258,8 +1304,8 @@ document.getElementById("coverArt").innerHTML = `
 </svg>`;
 
 /* ---------------- CHIPS / FILTERS ---------------- */
-const CATS = [["alle","Alle"],["perle","Perler"],["mat","Mat"],["modul","Dagsturer"]];
-const ZONELIST = [["alle","Alle soner"],["cannes","Cannes"],["nice","Nice"],["antibes","Antibes/Juan"],["monaco","Monaco/Øst"],["grasse","Grasse/Bakland"],["tropez","Saint-Tropez"],["verdon","Verdon"]];
+const CATS = [["alle","Alle"],["perle","Severdigheter"],["mat","Mat"],["modul","Dagsturer"]];
+const ZONELIST = [["alle","Alle områder"],["cannes","Cannes"],["nice","Nice"],["antibes","Antibes/Juan"],["monaco","Monaco/Øst"],["grasse","Grasse/Bakland"],["tropez","Saint-Tropez"],["verdon","Verdon"]];
 
 function buildChips(){
   document.getElementById("catChips").innerHTML = CATS.map(([v,l])=>`<div class="chip ${state.cat===v?'active':''}" onclick="setCat('${v}')">${l}</div>`).join("");
@@ -1279,6 +1325,8 @@ function render(){
   const tips=document.getElementById("tips");
   if(tips) tips.style.display = (state.cat==="alle"||state.cat==="uke")?"block":"none";
   grid.classList.toggle("week", state.cat==="uke"||state.cat==="sjekk");
+  const mt=document.getElementById("mapToggle");
+  if(mt){ const showTgl=!["uke","sjekk","modul"].includes(state.cat); mt.style.display=showTgl?"":"none"; mt.textContent=state.mapView?"☰ Liste":"🗺️ Kart"; }
 
   if(state.cat==="sjekk"){
     document.getElementById("secTitle").textContent="Bestillingssjekkliste";
@@ -1311,9 +1359,16 @@ function render(){
   if(state.zone!=="alle") items=items.filter(x=>x.z===state.zone);
   if(q) items=items.filter(x=> (x.n+" "+x.a+" "+(x.why||"")).toLowerCase().includes(q));
 
-  const titleMap={alle:"Alt i biblioteket",perle:"Perler",mat:"Matkart",modul:"Dagsturer",fav:"Dine favoritter"};
+  const titleMap={alle:"Alt i biblioteket",perle:"Severdigheter",mat:"Matkart",modul:"Dagsturer",fav:"Dine favoritter"};
   document.getElementById("secTitle").textContent = titleMap[state.cat]||"Anbefalt";
   document.getElementById("count").textContent = items.length+" steder";
+
+  if(state.mapView && state.cat!=="modul"){
+    grid.classList.remove("week");
+    grid.innerHTML = items.length ? `<div id="bigmap" style="grid-column:1/3"></div>` : `<div class="empty" style="grid-column:1/3">Ingen steder å vise på kartet.</div>`;
+    if(items.length) setTimeout(()=>buildBigMap(items),60);
+    return;
+  }
 
   if(!items.length){
     grid.innerHTML=`<div class="empty" style="grid-column:1/3">${state.cat==="fav"?"Ingen favoritter ennå. Trykk ♡ på et kort for å lagre det her.":"Ingen treff. Prøv et annet søk eller filter."}</div>`;
@@ -1324,19 +1379,37 @@ function render(){
       <div class="thumb">${scene(x.z,x.id)}${phImg(x)}${freshBadge(x.f)}
         <div class="fav" onclick="event.stopPropagation();toggleFav(${x.id})">${favs.includes(x.id)?'❤️':'♡'}</div>
       </div>
-      <div class="body"><h3>${x.n}</h3><div class="loc">📍 ${x.a}</div>
-        <div class="meta">${x.cat==="mat"?`<span class="price">${x.p}</span>`:(x.cat==="modul"?`<span class="tico">${transIcon(x)}</span>`:'')+kidPill(x.k)}<span style="font-size:11px;color:var(--ink-soft)">${ZONES[x.z].name}</span></div>
+      <div class="body"><h3>${x.n}</h3>
+        <div class="cone">${oneLiner(x)}</div>
+        <div class="ctags">${cardTags(x)}</div>
       </div></div>`).join("");
   hydrate(grid);
 }
+function cardTags(x){
+  const t=[`<span class="xtag">${ZONES[x.z].name}</span>`];
+  if(x.cat==="mat"){ t.unshift(`<span class="xtag price">${x.p}</span>`); if(isIce(x)) t.push(`<span class="xtag">🍦</span>`); }
+  else if(x.cat==="modul"){ t.unshift(`<span class="xtag">${transIcon(x)}</span>`); }
+  return t.join("");
+}
 
 /* ---------------- DETAIL ---------------- */
+function oneLiner(x){
+  let w=(x.why||"").replace(/^🍦\s*/,"").replace(/^[A-ZÆØÅ]+:\s*/,"");
+  const i=w.search(/[.!]/); if(i>5) w=w.slice(0,i);
+  if(w.length>96) w=w.slice(0,94).replace(/\s+\S*$/,"")+"…";
+  return w;
+}
 function xrow(x){
+  const tags=[];
+  if(x.cat==="mat"){ tags.push(`<span class="xtag price">${x.p}</span>`); if(isIce(x)) tags.push(`<span class="xtag">🍦 Iskrem</span>`); }
+  else { tags.push(`<span class="xtag mini ${x.k}">3-åring: ${x.k==='ja'?'Ja':x.k==='nei'?'Nei':'Delvis'}</span>`); }
+  if(x.f==="sannsynlig") tags.push(`<span class="xtag warn">sjekk nær avreise</span>`);
+  tags.push(`<span class="xtag">${x.a.split("·")[0].trim()}</span>`);
   return `<div class="xrow" onclick="openDetail(${x.id})">
     <div class="xth">${scene(x.z,x.id)}${phImg(x)}</div>
     <div class="xinfo"><h4>${x.n}</h4>
-      <div class="xsub">${x.cat==="mat"?`<span class="price" style="font-size:13px">${x.p}</span>`:`<span class="mini ${x.k}">3-åring: ${x.k==='ja'?'Ja':x.k==='nei'?'Nei':'Delvis'}</span>`}
-        <span>${x.a}</span></div></div>
+      <div class="xone">${oneLiner(x)}</div>
+      <div class="xtags">${tags.join("")}</div></div>
     <div class="xchev">›</div></div>`;
 }
 
@@ -1386,6 +1459,7 @@ function showDetail(id){
       <div class="d-block"><h3>Slik gjør du det riktig</h3><p>${x.tips}</p></div>
       <div class="d-block"><h3>Praktisk</h3><p>${x.pr}</p></div>`;
   }
+  if(x.cat!=="modul" && x.ll){ blocks += `<div class="d-block"><h3>Kart</h3><div id="placemap"></div></div>`; }
 
   // actions
   let actions = `<a class="d-src" href="${x.u}" target="_blank" rel="noopener">Åpne kilde ↗</a>`;
@@ -1399,6 +1473,7 @@ function showDetail(id){
     <div class="d-actions">${actions}</div>`;
   hydrate(document.getElementById("detail"));
   if(modStops && modStops.length) setTimeout(()=>buildModMap(modStops), 80);
+  if(x.cat!=="modul" && x.ll) setTimeout(()=>buildPlaceMap(x), 80);
 }
 
 /* ---------- HISTORIKK / FREM-TILBAKE ---------- */
