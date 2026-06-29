@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#cfe89a">
 <title>Rivieraen 2026 — Reiseguide</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
   :root{
     --cream:#f7f4e9; --cream2:#fbf9f0;
@@ -125,6 +127,11 @@
   .chk:last-child{border-bottom:none}
   .chk input{margin-top:1px; width:19px; height:19px; accent-color:var(--teal); flex:0 0 auto}
   .chk input:checked + span{color:var(--ink-soft); text-decoration:line-through}
+
+  /* kart i dagstur */
+  #modmap{height:230px; border-radius:14px; overflow:hidden; margin-top:8px; border:1px solid var(--line); background:#e8eee6}
+  .leaflet-container{font:inherit}
+  .leaflet-popup-content{font-family:var(--sans); font-size:13px}
 
   /* tidsskjema */
   .tl{margin-top:4px}
@@ -1074,6 +1081,48 @@ function transIcon(x){ const t=(x.trans||"")+" "+(x.a||""); let s="";
   return s||"📍"; }
 function openDetailByName(n){ const x=byName[n]; if(x) openDetail(x.id); }
 
+/* ---------------- KART (Leaflet + OpenStreetMap) ---------------- */
+let geo = (function(){ try{ return JSON.parse(localStorage.getItem("rivgeo")||"{}"); }catch(e){ return {}; } })();
+function saveGeo(){ try{ localStorage.setItem("rivgeo", JSON.stringify(geo)); }catch(e){} }
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+async function geocode(item){
+  if(item.n in geo) return geo[item.n];
+  const place = (item.a||"").split("·")[0].trim();
+  const q = encodeURIComponent(item.n + ", " + place + ", France");
+  // begrenset til Provence/Côte d'Azur for å unngå navnekrasj andre steder
+  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=fr&bounded=1&viewbox=4.4,44.7,7.9,43.1&q=${q}`;
+  try{
+    const r = await fetch(url, {headers:{'Accept':'application/json'}});
+    const d = await r.json();
+    geo[item.n] = (d && d[0]) ? [parseFloat(d[0].lat), parseFloat(d[0].lon)] : null;
+  }catch(e){ geo[item.n] = null; }
+  saveGeo();
+  return geo[item.n];
+}
+let _map = null;
+async function buildModMap(stops){
+  const el = document.getElementById("modmap");
+  if(!el) return;
+  if(typeof L === "undefined"){ el.innerHTML = "<div style='padding:16px;font-size:12px;color:#777'>Kart krever internett.</div>"; return; }
+  if(_map){ try{ _map.remove(); }catch(e){} _map=null; }
+  _map = L.map(el, {scrollWheelZoom:false}).setView([43.6,7.0], 9);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(_map);
+  setTimeout(()=>{ try{ _map.invalidateSize(); }catch(e){} }, 120);
+  const pts=[]; let n=0;
+  for(const s of stops){
+    if(document.getElementById("modmap")!==el) return;  // bruker navigerte videre
+    const c = await geocode(s);
+    if(c){
+      const safe = s.n.replace(/'/g,"\\'");
+      L.marker(c).addTo(_map).bindPopup(`<b>${s.n}</b><br><a href="#" onclick="openDetailByName('${safe}');return false;">Åpne ›</a>`);
+      pts.push(c);
+      if(pts.length>=1){ try{ _map.fitBounds(pts,{padding:[28,28],maxZoom:14}); }catch(e){} }
+    }
+    if(!(s.n in geo) || c===undefined){ /* nettopp hentet */ }
+    n++; if(n < stops.length) await sleep(1100);  // respekter OSM-grense (1/sek)
+  }
+}
+
 // Bestillingssjekkliste
 const CHECKLIST = [
   {group:"📌 Book i god tid (kan selge ut)", items:[
@@ -1290,12 +1339,13 @@ function showDetail(id){
   if(x.cat!=="mat") tags += ` <span class="tag ${x.k==='nei'?'warn':''}">3-åring: ${x.k==='ja'?'Ja':x.k==='nei'?'Nei':'Delvis'}</span>`;
   else tags += ` <span class="tag">Pris ${x.p}</span>`;
 
-  let blocks="";
+  let blocks=""; let modStops=null;
   if(x.cat==="modul"){
     const lk = LINKS[x.n]||{see:[],eat:[]};
     const md = MODDETAIL[x.n]||{};
     const zp = lk.see.map(n=>byName[n]).filter(Boolean);
     const zm = lk.eat.map(n=>byName[n]).filter(Boolean);
+    modStops = zp.concat(zm);
     const planHTML = (md.plan||[]).map(s=>{const i=s.indexOf(" — ");const t=i>0?s.slice(0,i):"";const d=i>0?s.slice(i+3):s;return `<div class="tlrow"><span class="tlt">${t}</span><span class="tld">${d}</span></div>`}).join("");
     blocks += `
       <div class="kvrow">
@@ -1309,6 +1359,7 @@ function showDetail(id){
       ${planHTML?`<div class="d-block"><h3>Forslag til tidsskjema</h3><div class="tl">${planHTML}</div></div>`:''}
       <div class="d-block"><h3>Mat-meny (forslag)</h3><p>${x.mat}</p></div>
       <div class="d-block"><h3>Pairer / kolliderer</h3><p>${x.pair}</p></div>
+      <div class="d-block"><h3>Kart over stoppene</h3><div id="modmap"></div><p class="muted" style="font-size:11px;margin-top:6px">Pins hentes fra OpenStreetMap og er omtrentlige der eksakt adresse mangler. Krever nett.</p></div>
       <div class="d-block"><h3>Severdigheter på denne turen (${zp.length})</h3>${zp.length?zp.map(xrow).join(""):'<p class="muted" style="font-size:13px">Ingen koblet ennå.</p>'}</div>
       <div class="d-block"><h3>Spisesteder på denne turen (${zm.length})</h3>${zm.length?zm.map(xrow).join(""):'<p class="muted" style="font-size:13px">Ingen koblet ennå.</p>'}</div>`;
   } else if(x.cat==="mat"){
@@ -1331,6 +1382,7 @@ function showDetail(id){
     ${blocks}
     <div class="d-actions">${actions}</div>`;
   hydrate(document.getElementById("detail"));
+  if(modStops && modStops.length) setTimeout(()=>buildModMap(modStops), 80);
 }
 
 /* ---------- HISTORIKK / FREM-TILBAKE ---------- */
