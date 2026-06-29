@@ -199,6 +199,7 @@
     <div class="tips" id="tips">
       <h3>🧭 Praktiske familieråd</h3>
       <ul>
+        <li>🏠 Base: 281 Chemin Notre-Dame, Vallauris (mellom Cannes og Antibes) — <a href="https://www.google.com/maps/search/?api=1&query=281%20Chemin%20Notre-Dame%2C%20Vallauris%2C%20France" target="_blank" rel="noopener">åpne i kart</a>. Vises som 🏠 på kartene.</li>
         <li>🛤️ Foretrekk tog/båt der det går — mindre stress med barn enn bil og parkering.</li>
         <li>🧺 Marché Forville som daglig base for picnic og hjemmemiddag ved bassenget.</li>
         <li>🌡️ Hold dagene fleksible — 3-åring + julivarme styrer tempoet.</li>
@@ -1124,6 +1125,12 @@ function markerIcon(x){
   return L.divIcon({className:"", html:`<div class="mpin" style="background:${pinColor(x)}">${pinEmoji(x)}</div>`,
     iconSize:[27,27], iconAnchor:[13,13], popupAnchor:[0,-12]});
 }
+const HOME = {name:"Vår base (Airbnb)", addr:"281 Chemin Notre-Dame, Vallauris 06220", ll:[43.5757,7.0788]};
+function homeMarker(map){
+  if(!map||typeof L==="undefined") return;
+  const ic=L.divIcon({className:"", html:`<div class="mpin" style="background:#1f3d2f;font-size:15px">🏠</div>`, iconSize:[31,31], iconAnchor:[15,15], popupAnchor:[0,-14]});
+  L.marker(HOME.ll,{icon:ic, zIndexOffset:1000}).addTo(map).bindPopup(`🏠 <b>${HOME.name}</b><br>${HOME.addr}`);
+}
 let _map = null;
 async function buildModMap(stops){
   const el = document.getElementById("modmap");
@@ -1147,6 +1154,7 @@ async function buildModMap(stops){
     }
     if(!instant){ await sleep(1100); }   // bare vent ved faktisk nett-henting (OSM 1/sek)
   }
+  homeMarker(_map);   // vis basen
 }
 
 // lite kart på et enkelt sted (severdighet/restaurant)
@@ -1174,6 +1182,7 @@ function buildBigMap(items){
     L.marker(s.ll,{icon:markerIcon(s)}).addTo(_bmap).bindPopup(`<b>${s.n}</b><br><span style="color:#777">${kind} · ${ZONES[s.z].name}</span><br><a href="#" onclick="openDetailByName('${safe}');return false;">Åpne ›</a>`);
     pts.push(s.ll);
   });
+  homeMarker(_bmap); pts.push(HOME.ll);   // vis basen og ta den med i utsnittet
   if(pts.length){ try{ _bmap.fitBounds(pts,{padding:[30,30],maxZoom:14}); }catch(e){} }
   setTimeout(()=>{ try{_bmap.invalidateSize();}catch(e){} },120);
 }
