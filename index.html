@@ -1568,13 +1568,21 @@ function go(screen){
 }
 
 /* ---------- SVEIP: høyre = tilbake, venstre = frem ---------- */
-let _sx=0,_sy=0,_st=0;
-document.addEventListener('touchstart',e=>{const t=e.changedTouches[0];_sx=t.clientX;_sy=t.clientY;_st=Date.now();},{passive:true});
+let _sx=0,_sy=0,_st=0,_multi=false;
+document.addEventListener('touchstart',e=>{
+  if(e.touches.length>1){_multi=true;return;}          // pinch/zoom – ikke sveip
+  _multi=false;
+  const t=e.changedTouches[0];_sx=t.clientX;_sy=t.clientY;_st=Date.now();
+},{passive:true});
+document.addEventListener('touchmove',e=>{ if(e.touches.length>1)_multi=true; },{passive:true});
 document.addEventListener('touchend',e=>{
+  if(_multi) return;                                   // var pinch/zoom med to fingre
   const t=e.changedTouches[0], dx=t.clientX-_sx, dy=t.clientY-_sy, dt=Date.now()-_st;
-  if(dt>700) return;                                  // for sakte
-  if(Math.abs(dx)<70 || Math.abs(dx)<Math.abs(dy)*1.7) return;  // ikke horisontalt nok
-  if(e.target.closest && e.target.closest('.chips')) return;    // la chip-radene scrolle fritt
+  if(dt>500) return;                                   // for sakte – var nok en pause/drag
+  if(Math.abs(dx)<110) return;                         // krev tydelig horisontal lengde
+  if(Math.abs(dx)<Math.abs(dy)*2.5) return;            // krev klart horisontal retning
+  if(e.target.closest && e.target.closest('.chips,.gallery,.leaflet-container,.leaflet-pane,input,textarea,select'))
+    return;                                            // kart, bildegallerier og scroll-rader sveiper ikke
   if(dx>0) goBack(); else goForward();
 },{passive:true});
 
