@@ -1486,41 +1486,19 @@ function motif(x){
 }
 
 /* ---------------- SVG SCENE (fallback) ---------------- */
-// Egen fargepalett per motiv, så hver dagstur får ulik bakgrunn (ikke bare sonefarge)
-const MOTIFPAL = {
- boat:["#e8f4fb","#c2e2f2","#8fc4dd","#5a93b8","#33607e"],
- oldtown:["#fdeede","#f6d3b0","#e0a877","#b9764a","#7f4a2c"],
- palette:["#f3e9fb","#dcc7ef","#b493d6","#8a63ad","#5e3f7e"],
- village:["#f3f1e2","#dcdcbf","#b6bd8f","#8a9a63","#5f6f43"],
- market:["#fdf3d6","#f7dca0","#e8b45e","#cf7f3a","#9c5527"],
- museum:["#f5f1e8","#e2dcc8","#c3b48f","#9a8a63","#6e6144"],
- palm:["#eafbea","#c6ecc0","#8fce86","#4fa15e","#2c7048"],
- lighthouse:["#e9f5f5","#c2e6e6","#8fcccc","#579ea0","#356c6e"],
- music:["#ecebfb","#cfceef","#a09fd6","#6f6db0","#454386"],
- glass:["#e6fbf7","#bdeee4","#7fd9c6","#3fb89f","#2a8f79"],
- casino:["#fbf0d8","#efd39a","#d4a24f","#9c5b3a","#6e2e33"],
- garden:["#fdeef3","#f6cede","#e59ebf","#b06a94","#6f4a6b"],
- perfume:["#f6ecf6","#e6cfe6","#c99fc9","#9a6d9a","#6b476b"],
- mountains:["#eef3f7","#d0dde8","#a3b8cc","#6f8aa6","#465e78"],
- waterfall:["#e9f6f1","#c4e6da","#8fcbb8","#4f9a86","#2f6f5f"],
- yacht:["#e6f2fb","#c2e0f2","#8fbfe0","#5a8fbf","#345f86"],
- canyon:["#e4f7f4","#bde9e0","#7fd4c6","#3fb8a2","#2a8f80"],
- lavender:["#f1ecfb","#d9cbf0","#b79fe0","#8a6ac0","#5e458f"],
- fountain:["#fdf6df","#f4e2a8","#e6c25e","#bf9a3a","#8a6f27"],
- lemon:["#fdf8d6","#f6ec9a","#e6d24f","#c0b03a","#8a8527"]
-};
-function modPal(x){ const k=MOTIF[x.n]; return (k&&MOTIFPAL[k])?MOTIFPAL[k]:null; }
-function scene(zone, seed, pal){
+function modGlyph(x){ const k=MOTIF[x.n]; return (k&&GLYPH[k])?GLYPH[k]:null; }
+function scene(zone, seed, pal, bgGlyph){
   const p = pal || (ZONES[zone]||ZONES.cannes).pal;
   const s = (seed||0)%3;
   const gid = "sk"+p[0].replace('#','')+s;
   const sun = `<circle cx="${78-s*8}%" cy="32%" r="20" fill="#fff8d8" opacity=".85"/>`;
+  const bgFig = bgGlyph ? `<g transform="translate(78,4) scale(4.5)" opacity=".18"><g fill="none" stroke="${p[4]}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${bgGlyph}</g></g>` : "";
   const tree = (x,y,sc,c)=>`<g transform="translate(${x},${y}) scale(${sc})"><rect x="-1.2" y="6" width="2.4" height="7" fill="#5b4632"/><polygon points="0,-10 8,8 -8,8" fill="${c}"/><polygon points="0,-3 6,10 -6,10" fill="${c}"/></g>`;
   let trees="";
   for(let i=0;i<4+s;i++){ const x=(20+i*70+s*15)%360; trees+=tree(x,150+(i%2)*8,.8+(i%3)*.25,p[4]); }
   return `<svg viewBox="0 0 360 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
     <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${p[0]}"/><stop offset="1" stop-color="${p[1]}"/></linearGradient></defs>
-    <rect width="360" height="200" fill="url(#${gid})"/>${sun}
+    <rect width="360" height="200" fill="url(#${gid})"/>${sun}${bgFig}
     <path d="M0,${120+s*6} Q90,${90+s*8} 180,118 T360,110 V200 H0 Z" fill="${p[2]}" opacity=".95"/>
     <path d="M0,145 Q120,${118+s*6} 240,146 T360,140 V200 H0 Z" fill="${p[3]}"/>${trees}
     <path d="M0,172 Q120,158 240,172 T360,168 V200 H0 Z" fill="${p[4]}"/></svg>`;
@@ -1660,7 +1638,7 @@ function render(){
   }
   grid.innerHTML = items.map(x=>`
     <div class="card" onclick="openDetail(${x.id})">
-      <div class="thumb">${scene(x.z,x.id,x.cat==='modul'?modPal(x):null)}${phImg(x)}${x.cat==='modul'?motif(x):''}${freshBadge(x.f)}
+      <div class="thumb">${scene(x.z,x.id,null,x.cat==='modul'?modGlyph(x):null)}${phImg(x)}${x.cat==='modul'?motif(x):''}${freshBadge(x.f)}
         <div class="fav" onclick="event.stopPropagation();toggleFav(${x.id})">${favs.includes(x.id)?'❤️':'♡'}</div>
         ${x.gallery&&x.gallery.length>1?`<span class="gcount">📷 ${x.gallery.length}</span>`:''}
       </div>
@@ -1691,7 +1669,7 @@ function xrow(x){
   if(x.f==="sannsynlig") tags.push(`<span class="xtag warn">sjekk nær avreise</span>`);
   tags.push(`<span class="xtag">${x.a.split("·")[0].trim()}</span>`);
   return `<div class="xrow" onclick="openDetail(${x.id})">
-    <div class="xth">${scene(x.z,x.id,x.cat==='modul'?modPal(x):null)}${phImg(x)}${x.cat==='modul'?motif(x):''}</div>
+    <div class="xth">${scene(x.z,x.id,null,x.cat==='modul'?modGlyph(x):null)}${phImg(x)}${x.cat==='modul'?motif(x):''}</div>
     <div class="xinfo"><h4>${x.n}</h4>
       <div class="xone">${oneLiner(x)}</div>
       <div class="xtags">${tags.join("")}</div></div>
@@ -1702,7 +1680,7 @@ function showDetail(id){
   currentId=id;
   const x=ALL.find(i=>i.id===id);
   document.getElementById("dHero").innerHTML =
-    scene(x.z,x.id,x.cat==='modul'?modPal(x):null)+phImg(x)+(x.cat==='modul'?motif(x):'')+
+    scene(x.z,x.id,null,x.cat==='modul'?modGlyph(x):null)+phImg(x)+(x.cat==='modul'?motif(x):'')+
     `<button class="d-back" onclick="back()">←</button>
      <button class="d-fav" onclick="toggleFavFromDetail()">${favs.includes(id)?'❤️':'♡'}</button>`;
 
