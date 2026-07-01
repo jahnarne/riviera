@@ -60,6 +60,10 @@
   .card{background:var(--cream2); border:1px solid var(--line); border-radius:18px; overflow:hidden; cursor:pointer; box-shadow:var(--shadow); display:flex; flex-direction:column}
   .card:active{transform:translateY(1px)}
   .card .thumb{height:104px; position:relative}
+  .motif{position:absolute; right:8px; bottom:8px; width:50px; height:50px; pointer-events:none; filter:drop-shadow(0 1px 2px rgba(0,0,0,.28)); z-index:1}
+  .motif svg{width:100%; height:100%; display:block}
+  .xth .motif{width:34px; height:34px; right:5px; bottom:5px}
+  .d-hero .motif{width:88px; height:88px; right:16px; bottom:16px}
   .card .thumb svg{width:100%;height:100%;display:block}
   .badge{position:absolute; top:8px; left:8px; font-size:10.5px; font-weight:700; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,.92); color:var(--ink); z-index:2}
   .card .fav{position:absolute; top:7px; right:7px; width:26px;height:26px;border-radius:50%; background:rgba(255,255,255,.9); display:flex;align-items:center;justify-content:center; font-size:14px; z-index:2}
@@ -1442,6 +1446,45 @@ function gmaps(x){
   return `https://www.google.com/maps/search/?api=1&query=${q}`;
 }
 
+/* ---------------- MODUL-MOTIV (stiliserte tema-ikoner) ---------------- */
+const MOTIF = {
+ "1 · Lérins-øydag":"boat","2 · Cannes til fots":"oldtown","3 · Kunst & keramikk nær Cannes":"palette",
+ "4 · Mougins-kveld":"village","5 · Vieux Nice — marked & socca":"market","6 · Cimiez — museer & olivenlund":"museum",
+ "7 · Parc Phoenix + Promenade":"palm","8 · Antibes gamleby + Picasso":"oldtown","9 · Cap d'Antibes — strand & fyr":"lighthouse",
+ "9b · Cap d'Antibes + La Plage du Cap":"lighthouse","10 · Juan-les-Pins + Jazz Off":"music","11 · Biot — glassverk + landsby":"glass",
+ "12 · Monaco-dagen":"casino","13 · Kornisjene øst: Èze + Villefranche":"village","14 · Villa Ephrussi + Villefranche-bad":"garden",
+ "14b · Cap-Ferrat + Èze light":"garden","15 · Parfyme i Grasse":"perfume","16 · Kunst i Saint-Paul & Vence":"palette",
+ "17 · Fjellandsbyer & juv":"waterfall","18 · Østlige fjellandsbyer: Coaraze":"mountains","19 · Saint-Tropez (kjør + båt)":"yacht",
+ "20 · Port Grimaud + Sainte-Maxime":"boat","21 · Verdon-canyon + turkis innsjø":"canyon","22 · Verdon over to dager (overnatting)":"lavender",
+ "23 · Aix-en-Provence halvdag":"fountain","24 · Menton — sitronbyen (lang dagstur)":"lemon"
+};
+const GLYPH = {
+ boat:'<path d="M8 21h16l-2.5 4.5H10.5z"/><path d="M16 5v16"/><path d="M16 7c4 2 6 5 6 9H16z"/>',
+ oldtown:'<path d="M7 26V16l4-3 4 3v10"/><path d="M17 26V11l3.5-2.5L24 11v15"/><path d="M6 26h20"/>',
+ palette:'<path d="M16 7a9 9 0 100 18c1.4 0 1.6-1.8 2.5-2.4 1-.7 3 .4 3-2A8.6 8.6 0 0016 7z"/><circle cx="12" cy="13" r=".9"/><circle cx="19" cy="12" r=".9"/><circle cx="20.5" cy="16.5" r=".9"/>',
+ village:'<path d="M7 26v-7h6v7z"/><path d="M6 19.5l4-3 4 3"/><path d="M15 26V14h7v12z"/><path d="M14 14.5l4.5-3.5L23 14.5"/><path d="M6 26h18"/>',
+ market:'<path d="M8 13h16l-1.5 4H9.5z"/><path d="M9 10h14l1.5 3H7.5z"/><path d="M10 17v8m12-8v8"/><path d="M10 25h12"/>',
+ museum:'<path d="M6 12l10-5 10 5H6z"/><path d="M8 14v9m4-9v9m8-9v9m-4-9v9"/><path d="M6 25h20"/>',
+ palm:'<path d="M16 27c0-6 0-10-.5-14"/><path d="M15.5 13c0-3 2-5.5 5-6.5-.5 3.5-2 5.5-5 6.5zm0 0c0-3-2-5.5-5-6.5.5 3.5 2 5.5 5 6.5zm0 0c3-1.5 6.5-1 9 1-3.5.5-6.5 0-9-1zm0 0c-3-1.5-6.5-1-9 1 3.5.5 6.5 0 9-1z"/><circle cx="15.5" cy="12.5" r="1.1" fill="#fff" stroke="none"/>',
+ lighthouse:'<path d="M13 26l1-8h4l1 8z"/><rect x="13.6" y="12" width="4.8" height="6"/><path d="M13 12l1-2.2h4l1 2.2z"/><path d="M14 9.8h4V8.4h-4z"/><path d="M11 26h10"/>',
+ music:'<path d="M13 22V8l8-2v12"/><circle cx="11" cy="22" r="2.4"/><circle cx="19" cy="20" r="2.4"/>',
+ glass:'<path d="M11 7h10l-1 6a4 4 0 01-8 0z"/><path d="M16 17v6"/><path d="M12 25h8"/>',
+ casino:'<path d="M7 12l3.5 6h11L25 12l-5 4-4-7-4 7z"/><path d="M9 22h14"/>',
+ garden:'<circle cx="16" cy="11" r="2.5"/><path d="M16 11c0-4 3-5 3-5m-3 5c0-4-3-5-3-5m3 5c3-1.5 5 .5 5 .5m-5-.5c-3-1.5-5 .5-5 .5"/><path d="M16 14v11"/>',
+ perfume:'<rect x="11" y="13" width="10" height="12" rx="2"/><rect x="13.5" y="8" width="5" height="5"/><path d="M14 8V6h4v2"/>',
+ mountains:'<path d="M5 24l6-11 4 6 3-5 7 10H5z"/><path d="M11 13l2.5 3.5"/>',
+ waterfall:'<path d="M6 22l6-12 4 6 3-4 6 10"/><path d="M12 22v4m4-3v4m4-4v4"/>',
+ yacht:'<path d="M5 21h22l-3 5H8z"/><path d="M9 21V9l12 3v9"/><path d="M9 12h12"/>',
+ canyon:'<path d="M5 8v10l4.5 1.5V9z"/><path d="M27 8v10l-4.5 1.5V9z"/><path d="M10 22.5q6 2.5 12 0"/><path d="M10 25.5q6 2.5 12 0"/>',
+ lavender:'<path d="M13 26V15m6 11V13"/><path d="M13 8c-1.2 1-1.2 3 0 4 1.2-1 1.2-3 0-4zm0 4c-1.2 1-1.2 3 0 4 1.2-1 1.2-3 0-4z"/><path d="M19 6c-1.2 1-1.2 3 0 4 1.2-1 1.2-3 0-4zm0 4c-1.2 1-1.2 3 0 4 1.2-1 1.2-3 0-4z"/>',
+ fountain:'<path d="M12 25v-6h8v6"/><path d="M16 19v-5"/><path d="M16 13c-2 0-3-2-3-2m3 2c2 0 3-2 3-2"/><circle cx="16" cy="9" r="1.5"/><path d="M10 25h12"/>',
+ lemon:'<ellipse cx="16" cy="17" rx="8" ry="6"/><path d="M22 10l2.5-2.5"/><path d="M21 10c1-1 3-1 4-2-.5 1.5-1 2.5-2.5 3"/>'
+};
+function motif(x){
+  const k=MOTIF[x.n]; if(!k||!GLYPH[k]) return "";
+  return `<div class="motif"><svg viewBox="0 0 32 32" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="15" fill="#1f3d2f" fill-opacity=".34" stroke="none"/>${GLYPH[k]}</svg></div>`;
+}
+
 /* ---------------- SVG SCENE (fallback) ---------------- */
 function scene(zone, seed){
   const p = (ZONES[zone]||ZONES.cannes).pal;
@@ -1489,7 +1532,7 @@ function setZone(v){ navTo({cat:state.cat, zone:v}); }
 function navCat(v){ go('home'); navTo({cat:v, zone:state.zone}); }
 function syncNav(){ document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active", b.dataset.cat===state.cat)); }
 
-function freshBadge(f){ return `<span class="badge">${f==="bekreftet"?"✓ Bekreftet":f==="sannsynlig"?"~ Sjekk nær":"? Usikkert"}</span>`; }
+function freshBadge(f){ if(f==="bekreftet") return ""; return `<span class="badge">${f==="sannsynlig"?"~ Sjekk nær":"? Usikkert"}</span>`; }
 function kidPill(k){ const m={ja:"3-åring: Ja",delvis:"3-åring: Delvis",nei:"3-åring: Nei"}; return `<span class="pill ${k}">${m[k]||m.delvis}</span>`; }
 
 /* ---------------- PRAKTISK (generelle tips) ---------------- */
@@ -1592,7 +1635,7 @@ function render(){
   }
   grid.innerHTML = items.map(x=>`
     <div class="card" onclick="openDetail(${x.id})">
-      <div class="thumb">${scene(x.z,x.id)}${phImg(x)}${freshBadge(x.f)}
+      <div class="thumb">${scene(x.z,x.id)}${phImg(x)}${x.cat==='modul'?motif(x):''}${freshBadge(x.f)}
         <div class="fav" onclick="event.stopPropagation();toggleFav(${x.id})">${favs.includes(x.id)?'❤️':'♡'}</div>
         ${x.gallery&&x.gallery.length>1?`<span class="gcount">📷 ${x.gallery.length}</span>`:''}
       </div>
@@ -1623,7 +1666,7 @@ function xrow(x){
   if(x.f==="sannsynlig") tags.push(`<span class="xtag warn">sjekk nær avreise</span>`);
   tags.push(`<span class="xtag">${x.a.split("·")[0].trim()}</span>`);
   return `<div class="xrow" onclick="openDetail(${x.id})">
-    <div class="xth">${scene(x.z,x.id)}${phImg(x)}</div>
+    <div class="xth">${scene(x.z,x.id)}${phImg(x)}${x.cat==='modul'?motif(x):''}</div>
     <div class="xinfo"><h4>${x.n}</h4>
       <div class="xone">${oneLiner(x)}</div>
       <div class="xtags">${tags.join("")}</div></div>
@@ -1634,12 +1677,12 @@ function showDetail(id){
   currentId=id;
   const x=ALL.find(i=>i.id===id);
   document.getElementById("dHero").innerHTML =
-    scene(x.z,x.id)+phImg(x)+
+    scene(x.z,x.id)+phImg(x)+(x.cat==='modul'?motif(x):'')+
     `<button class="d-back" onclick="back()">←</button>
      <button class="d-fav" onclick="toggleFavFromDetail()">${favs.includes(id)?'❤️':'♡'}</button>`;
 
-  let tags = `<span class="tag fresh">${x.f==="bekreftet"?"✓ Bekreftet juli 2026":x.f==="sannsynlig"?"~ Sannsynlig – sjekk nær avreise":"? Usikkert – må bekreftes"}</span>
-              <span class="tag">${ZONES[x.z].name}</span>`;
+  let tags = (x.f==="bekreftet"?"":`<span class="tag fresh">${x.f==="sannsynlig"?"~ Sannsynlig – sjekk nær avreise":"? Usikkert – må bekreftes"}</span> `)
+              + `<span class="tag">${ZONES[x.z].name}</span>`;
   if(x.cat!=="mat") tags += ` <span class="tag ${x.k==='nei'?'warn':''}">3-åring: ${x.k==='ja'?'Ja':x.k==='nei'?'Nei':'Delvis'}</span>`;
   else tags += ` <span class="tag">Pris ${x.p}</span>`;
 
