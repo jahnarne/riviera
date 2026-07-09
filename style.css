@@ -1,0 +1,272 @@
+/* Rivieraen 2026 — delt stil (uttrekk fra opprinnelig index.html) */
+  :root{
+    --cream:#f7f4e9; --cream2:#fbf9f0;
+    --green:#cfe89a; --green-soft:#e6f2c6; --green-deep:#b7da78;
+    --ink:#21372a; --ink-soft:#4d6152; --line:#e4ded0;
+    --teal:#1d7874; --rust:#b5402a; --amber:#c98a16;
+    --shadow:0 10px 30px rgba(33,55,42,.10);
+    --serif:Georgia,'Times New Roman',serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--sans); background:#dce9bf; color:var(--ink); display:flex; justify-content:center; min-height:100vh}
+  #app{width:100%; max-width:460px; background:var(--cream); min-height:100vh; position:relative; overflow:hidden; box-shadow:0 0 60px rgba(0,0,0,.12)}
+  .screen{display:none; flex-direction:column; min-height:100vh; padding-bottom:80px}
+  .screen.active{display:flex}
+  h1,h2,h3{font-family:var(--serif); font-weight:700; line-height:1.15; margin:0}
+  .muted{color:var(--ink-soft)}
+  a{color:var(--teal)}
+
+  /* COVER */
+  #cover{justify-content:space-between; background:radial-gradient(120% 80% at 50% 0%, #fbf9ef 0%, #f1ecda 55%, #e7f0c9 100%)}
+  .cover-art{flex:1; display:flex; align-items:center; justify-content:center; padding:30px 24px 0}
+  .cover-art svg{width:100%; max-width:340px; height:auto}
+  .cover-copy{padding:0 28px 34px}
+  .cover-copy h1{font-size:38px; letter-spacing:-.5px}
+  .cover-copy p{font-size:15.5px; line-height:1.55; color:var(--ink-soft); margin:14px 0 22px}
+  .btn{display:block; width:100%; text-align:center; border:none; cursor:pointer; background:var(--green); color:var(--ink); font-family:var(--serif); font-size:18px; font-weight:700; padding:18px; border-radius:16px; box-shadow:var(--shadow)}
+  .btn:active{transform:translateY(1px)}
+
+  .top{display:flex; align-items:center; justify-content:space-between; padding:22px 18px 6px}
+  .top .avatar{width:42px;height:42px;border-radius:50%;background:var(--green-deep);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;color:#22351f;font-size:18px}
+  .bell{width:42px;height:42px;border-radius:50%;background:var(--cream2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+  .hello{padding:6px 18px 2px}
+  .hello h1{font-size:30px; letter-spacing:-.5px}
+  .hello p{margin:4px 0 0; color:var(--ink-soft); font-size:14px}
+
+  .search{margin:14px 18px 6px; display:flex; align-items:center; gap:10px; background:var(--cream2); border:1px solid var(--line); border-radius:14px; padding:13px 14px}
+  .search input{border:none; background:transparent; outline:none; font-size:15px; width:100%; color:var(--ink)}
+
+  .chips{display:flex; gap:9px; overflow-x:auto; padding:12px 18px 8px; scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto; border:1px solid var(--line); background:var(--cream2); color:var(--ink-soft); padding:9px 15px; border-radius:999px; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap}
+  .chip.active{background:var(--green); color:var(--ink); border-color:var(--green-deep)}
+
+  .sec-label{display:flex; align-items:baseline; justify-content:space-between; padding:14px 18px 4px}
+  .sec-label h2{font-size:20px}
+  .sec-label span{font-size:13px; color:var(--ink-soft)}
+
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; padding:8px 18px 10px}
+  .card{background:var(--cream2); border:1px solid var(--line); border-radius:18px; overflow:hidden; cursor:pointer; box-shadow:var(--shadow); display:flex; flex-direction:column}
+  .card:active{transform:translateY(1px)}
+  .card .thumb{height:104px; position:relative}
+  .motif{position:absolute; right:8px; bottom:8px; width:50px; height:50px; pointer-events:none; filter:drop-shadow(0 1px 2px rgba(0,0,0,.28)); z-index:1}
+  .motif svg{width:100%; height:100%; display:block}
+  .xth .motif{width:34px; height:34px; right:5px; bottom:5px}
+  .d-hero .motif{width:88px; height:88px; right:16px; bottom:16px}
+  .card .thumb svg{width:100%;height:100%;display:block}
+  .badge{position:absolute; top:8px; left:8px; font-size:10.5px; font-weight:700; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,.92); color:var(--ink); z-index:2}
+  .card .fav{position:absolute; top:7px; right:7px; width:26px;height:26px;border-radius:50%; background:rgba(255,255,255,.9); display:flex;align-items:center;justify-content:center; font-size:14px; z-index:2}
+  .card .body{padding:10px 11px 12px}
+  .card .body h3{font-size:14.5px; line-height:1.2}
+  .card .loc{display:flex; align-items:center; gap:4px; color:var(--ink-soft); font-size:11.5px; margin-top:5px}
+  .card .meta{display:flex; align-items:center; justify-content:space-between; margin-top:8px}
+  .cone{font-size:11.5px; color:var(--ink-soft); line-height:1.4; margin-top:5px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+  .ctags{display:flex; gap:5px; align-items:center; flex-wrap:wrap; margin-top:7px}
+  .pill{font-size:11px; font-weight:700; padding:3px 8px; border-radius:999px}
+  .pill.ja{background:#dcefb6; color:#3b5a1e}
+  .pill.delvis{background:#fbe7bd; color:#8a5a08}
+  .pill.nei{background:#f3cabf; color:#8a2c19}
+  .price{font-family:var(--serif); font-weight:700; font-size:14px}
+  .empty{padding:40px 24px; text-align:center; color:var(--ink-soft)}
+
+  /* real photo overlay */
+  img.ph{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .45s; z-index:1}
+  img.ph.show{opacity:1}
+  .gcount{position:absolute; bottom:8px; right:8px; font-size:10.5px; font-weight:700; padding:3px 7px; border-radius:999px; background:rgba(0,0,0,.55); color:#fff; z-index:2}
+  .gallery{display:flex; gap:8px; overflow-x:auto; scroll-snap-type:x mandatory; margin-top:8px; padding-bottom:4px; scrollbar-width:none}
+  .gallery::-webkit-scrollbar{display:none}
+  .gallery img{height:190px; border-radius:12px; flex:0 0 auto; scroll-snap-align:start; object-fit:cover; background:#e8eee6}
+
+  /* DETAIL */
+  #detail{position:fixed; top:0; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:460px; background:var(--cream); z-index:30; display:none; flex-direction:column; overflow-y:auto; -webkit-overflow-scrolling:touch}
+  #detail.active{display:flex}
+  .d-hero{height:240px; position:relative}
+  .d-hero svg{width:100%;height:100%;display:block}
+  .d-back,.d-fav{position:absolute; top:18px; width:42px;height:42px;border-radius:50%; background:rgba(255,255,255,.92); border:none; display:flex;align-items:center;justify-content:center; cursor:pointer; box-shadow:var(--shadow); z-index:3}
+  .d-back{left:16px; font-size:20px}
+  .d-fav{right:16px; font-size:19px}
+  .d-sheet{background:var(--cream); border-radius:26px 26px 0 0; margin-top:-26px; position:relative; padding:22px 20px 40px; z-index:2}
+  .d-tagrow{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px}
+  .tag{font-size:11.5px; font-weight:700; padding:5px 10px; border-radius:999px; background:var(--green-soft); color:#3b5a1e}
+  .tag.fresh{background:#d7eef0; color:#155e5b}
+  .tag.warn{background:#fbe7bd; color:#8a5a08}
+  .d-title h1{font-size:25px; letter-spacing:-.3px}
+  .d-loc{display:flex; align-items:center; gap:6px; color:var(--ink-soft); font-size:13.5px; margin:8px 0 4px}
+  .d-block{margin-top:18px}
+  .d-block h3{font-family:var(--sans); font-weight:800; text-transform:uppercase; letter-spacing:.4px; color:var(--teal); margin-bottom:6px; font-size:12px}
+  .d-block p{margin:0; font-size:14.5px; line-height:1.6; color:#33433a}
+  .d-actions{display:flex; gap:10px; margin-top:22px}
+  .d-src{flex:1; display:flex; align-items:center; justify-content:center; gap:7px; text-decoration:none; background:var(--green); color:var(--ink); font-family:var(--serif); font-weight:700; font-size:15px; padding:15px 10px; border-radius:14px; box-shadow:var(--shadow)}
+  .d-src.light{background:var(--cream2); border:1px solid var(--line)}
+  .kvrow{display:flex; gap:10px; flex-wrap:wrap; margin-top:6px}
+  .kv{flex:1 1 calc(50% - 5px); background:var(--cream2); border:1px solid var(--line); border-radius:13px; padding:11px 12px}
+  .kv .k{font-size:10.5px; text-transform:uppercase; letter-spacing:.4px; color:var(--ink-soft); font-weight:700}
+  .kv .v{font-size:14px; font-weight:600; margin-top:3px}
+
+  /* cross-link rows in modules */
+  .xrow{display:flex; align-items:flex-start; gap:11px; padding:10px; border:1px solid var(--line); border-radius:14px; background:var(--cream2); margin-top:9px; cursor:pointer}
+  .xrow:active{transform:translateY(1px)}
+  .xth{width:60px;height:60px;border-radius:11px;overflow:hidden;flex:0 0 auto;position:relative}
+  .xth svg,.xth img{width:100%;height:100%;object-fit:cover;display:block}
+  .xinfo{flex:1; min-width:0}
+  .xinfo h4{margin:0;font-size:14px;font-family:var(--sans);font-weight:700;line-height:1.25}
+  .xone{font-size:12px;color:var(--ink-soft);line-height:1.4;margin-top:3px}
+  .xtags{display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-top:6px}
+  .xtag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:var(--green-soft);color:#3b5a1e;white-space:nowrap}
+  .xtag.price{font-family:var(--serif)}
+  .xtag.warn{background:#fbe7bd;color:#8a5a08}
+  .xchev{color:var(--ink-soft); font-size:20px; flex:0 0 auto; align-self:center}
+  .mini{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px}
+  .xtag.ja,.mini.ja{background:#dcefb6;color:#3b5a1e}
+  .xtag.delvis,.mini.delvis{background:#fbe7bd;color:#8a5a08}
+  .xtag.nei,.mini.nei{background:#f3cabf;color:#8a2c19}
+
+  .nav{position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:460px; background:var(--cream2); border-top:1px solid var(--line); display:flex; justify-content:space-around; padding:10px 6px calc(10px + env(safe-area-inset-bottom)); z-index:25}
+  .nav button{border:none; background:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; color:var(--ink-soft); font-size:9px; font-weight:600; padding:4px 3px; border-radius:12px}
+  .nav button.active{color:var(--ink)}
+  .nav button.active .ic{background:var(--green); border-radius:11px}
+  .nav .ic{width:34px;height:27px; display:flex; align-items:center; justify-content:center; font-size:15px}
+
+  /* booking checklist */
+  .chk{display:flex; gap:11px; align-items:flex-start; padding:9px 2px; font-size:13.5px; cursor:pointer; border-bottom:1px solid var(--line)}
+  .chk:last-child{border-bottom:none}
+  .chk input{margin-top:1px; width:19px; height:19px; accent-color:var(--teal); flex:0 0 auto}
+  .chk input:checked + span{color:var(--ink-soft); text-decoration:line-through}
+
+  /* kart i dagstur */
+  #modmap{height:230px; border-radius:14px; overflow:hidden; margin-top:8px; border:1px solid var(--line); background:#e8eee6}
+  #placemap{height:180px; border-radius:14px; overflow:hidden; margin-top:6px; border:1px solid var(--line); background:#e8eee6}
+  #bigmap{height:72vh; min-height:360px; border-radius:16px; overflow:hidden; border:1px solid var(--line); background:#e8eee6}
+  .maptgl{border:1px solid var(--green-deep); background:var(--green-soft); color:var(--ink); font-size:12px; font-weight:700; padding:6px 11px; border-radius:999px; cursor:pointer}
+  .modetip{background:var(--green); border-radius:12px; padding:11px 13px; margin-top:4px; font-size:13.5px; font-weight:700; color:#1f3d2f}
+  .leaflet-container{font:inherit}
+  .leaflet-popup-content{font-family:var(--sans); font-size:13px}
+  .mpin{width:27px;height:27px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:14px}
+  .maplegend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:11.5px;color:var(--ink-soft)}
+  .maplegend span{display:inline-flex;align-items:center;gap:4px}
+  .lgdot{display:inline-block;width:13px;height:13px;border-radius:50%;border:1.5px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+
+  /* tidsskjema */
+  .tl{margin-top:4px}
+  .tlrow{display:flex; gap:10px; padding:6px 0; border-bottom:1px dashed var(--line)}
+  .tlrow:last-child{border-bottom:none}
+  .tlt{flex:0 0 86px; font-weight:700; color:var(--teal); font-size:12.5px}
+  .tld{flex:1; font-size:13.5px; line-height:1.45; color:#33433a}
+  .hidden{display:none!important}
+  .footer-note{padding:18px 22px 30px; color:var(--ink-soft); font-size:12px; line-height:1.5; text-align:center}
+
+  /* family tips box */
+  .tips{background:var(--green-soft); border:1px solid var(--green-deep); border-radius:16px; padding:13px 15px; margin:12px 18px 2px}
+  .tips h3{font-size:14px; margin-bottom:7px; display:flex; align-items:center; gap:6px}
+  .tips ul{margin:0; padding:0; list-style:none}
+  .tips li{font-size:12.5px; line-height:1.5; color:#33433a; margin:5px 0; padding-left:2px}
+  .tcard{display:inline-flex; gap:5px; align-items:center; font-size:11px; font-weight:700; background:var(--cream2); border:1px solid var(--line); padding:3px 8px; border-radius:999px; margin-right:6px}
+
+  /* transport icon on module cards */
+  .tico{font-size:13px; margin-right:5px}
+
+  /* week / ukesplan view */
+  .grid.week{grid-template-columns:1fr}
+  .dayc{background:var(--cream2); border:1px solid var(--line); border-radius:16px; padding:14px 15px; box-shadow:var(--shadow)}
+  .dayhead{display:flex; align-items:center; gap:8px}
+  .dnum{font-family:var(--serif); font-weight:700; font-size:16px}
+  .ddate{color:var(--ink-soft); font-size:13px}
+  .dtag{margin-left:auto; font-size:10px; font-weight:700; background:var(--green); padding:4px 9px; border-radius:999px}
+  .dtitle{font-weight:700; margin-top:7px; font-size:14px; color:var(--ink)}
+  .dnote{margin:6px 0 0; font-size:12.5px; color:var(--ink-soft); line-height:1.5}
+  .dmods{display:flex; flex-wrap:wrap; gap:7px; margin-top:11px}
+  .dmod{font-size:12px; font-weight:600; background:var(--green-soft); border:1px solid var(--green-deep); color:#33433a; padding:6px 11px; border-radius:999px; cursor:pointer}
+  .dmod:active{transform:translateY(1px)}
+  .dayc ul.plist{margin:8px 0 0; padding-left:18px}
+  .dayc ul.plist li{margin:6px 0; font-size:13px; line-height:1.46; color:#3a463f}
+  .dayc ul.plist li a{color:var(--green-deep); font-weight:600}
+
+/* ============================================================
+   REISEGUIDE — nye komponenter (forside, dagsside, steder)
+   ============================================================ */
+#app{ padding-bottom:24px; }
+.d-back{ text-decoration:none; color:var(--ink); line-height:1 }
+
+/* ---- FORSIDE ---- */
+.home-cover{ background:radial-gradient(120% 80% at 50% 0%, #fbf9ef 0%, #f1ecda 55%, #e7f0c9 100%); padding-top:8px }
+.home-cover .cover-art{ padding:22px 24px 0 }
+.home-cover .cover-copy{ padding:6px 24px 24px }
+.home-cover .cover-copy p{ margin:12px 0 0 }
+.daylist{ display:flex; flex-direction:column; gap:14px; padding:6px 16px 8px }
+.daycard{ display:flex; flex-direction:column; text-decoration:none; color:var(--ink); background:var(--cream2); border:1px solid var(--line); border-radius:18px; overflow:hidden; box-shadow:var(--shadow) }
+.daycard:active{ transform:translateY(1px) }
+.daycard-th{ position:relative; height:132px }
+.daycard-th svg{ width:100%; height:100%; display:block }
+.daycard-num{ position:absolute; top:10px; left:10px; z-index:2; font-family:var(--serif); font-weight:700; font-size:12.5px; padding:5px 11px; border-radius:999px; background:rgba(255,255,255,.92); color:var(--ink) }
+.daycard-b{ padding:12px 14px 15px }
+.daycard-b h3{ font-size:17px; line-height:1.22; margin:9px 0 0 }
+.daycard-note{ font-size:12.5px; line-height:1.45; color:var(--ink-soft); margin:7px 0 0 }
+.daycard-meta{ font-size:11.5px; color:var(--teal); font-weight:700; margin-top:8px }
+.day-head{ display:flex; align-items:center; gap:8px; flex-wrap:wrap }
+.dnum{ font-family:var(--serif); font-weight:700; font-size:13px; background:var(--green-deep); color:#22351f; padding:3px 9px; border-radius:999px }
+.ddate{ font-size:12.5px; color:var(--ink-soft); font-weight:600 }
+.dtag{ font-size:11px; font-weight:700; background:var(--green-soft); color:#3b5a1e; padding:3px 9px; border-radius:999px }
+.home-links{ display:flex; flex-direction:column; gap:10px; padding:16px 16px 6px }
+.btn2{ display:block; text-align:center; text-decoration:none; background:var(--green); color:var(--ink); font-family:var(--serif); font-weight:700; font-size:16px; padding:15px; border-radius:14px; box-shadow:var(--shadow) }
+.btn2.light{ background:var(--cream2); border:1px solid var(--line) }
+.btn2:active{ transform:translateY(1px) }
+.foot{ text-align:center; font-size:12px; color:var(--ink-soft); padding:20px 20px 10px }
+.foot a{ color:var(--teal) }
+
+/* ---- DAGSSIDE HERO ---- */
+.day-hero{ position:relative; height:250px; overflow:hidden }
+.day-hero svg{ width:100%; height:100%; display:block }
+.day-hero .badge{ top:auto; bottom:120px }
+.day-hero-cap{ position:absolute; left:0; right:0; bottom:0; padding:34px 18px 16px; background:linear-gradient(to top, rgba(20,32,24,.82) 0%, rgba(20,32,24,.5) 45%, rgba(20,32,24,0) 100%); color:#fff }
+.day-hero-cap .ddate{ color:#e9f0dd }
+.day-hero-cap .dnum{ background:var(--green); color:#22351f }
+.day-title{ font-size:24px; letter-spacing:-.3px; margin:8px 0 4px; color:#fff }
+.day-count{ font-size:12px; color:#dfe8d3; font-weight:600 }
+.day-body{ padding:16px 16px 8px }
+.dnote.big{ font-size:14.5px; line-height:1.55; color:#33433a; background:var(--green-soft); border:1px solid var(--green-deep); border-radius:14px; padding:13px 14px; margin:0 0 4px }
+
+/* ---- SEKSJONER ---- */
+.sec{ margin-top:22px }
+.sec-title{ font-family:var(--serif); font-weight:700; font-size:19px; display:flex; align-items:center; gap:8px; margin-bottom:10px }
+.sec-n{ font-family:var(--sans); font-size:12px; font-weight:700; color:var(--teal); background:var(--green-soft); padding:2px 9px; border-radius:999px }
+.card-tl{ background:var(--cream2); border:1px solid var(--line); border-radius:16px; padding:8px 15px; box-shadow:var(--shadow) }
+#daymap{ height:250px; border-radius:16px; overflow:hidden; border:1px solid var(--line); background:#e8eee6 }
+
+/* ---- STED-SEKSJON ---- */
+.places{ display:flex; flex-direction:column; gap:18px }
+.place{ background:var(--cream2); border:1px solid var(--line); border-radius:20px; overflow:hidden; box-shadow:var(--shadow) }
+.place-hero{ position:relative; height:190px; overflow:hidden }
+.place-hero svg{ width:100%; height:100%; display:block }
+.place-body{ padding:16px 16px 18px }
+.place-title{ font-size:21px; letter-spacing:-.2px; margin:2px 0 0 }
+.place .d-block{ margin-top:14px }
+.place .d-actions{ margin-top:18px }
+.placemap{ height:170px; border-radius:12px; overflow:hidden; border:1px solid var(--line); background:#e8eee6; margin-top:6px }
+
+/* ---- ALTERNATIVER ---- */
+.alt-sec{ background:#fbf4e6; border:1px dashed var(--amber); border-radius:18px; padding:16px 14px; margin-top:26px }
+.altgrid{ display:flex; flex-direction:column; gap:10px }
+.altc{ display:flex; gap:12px; text-decoration:none; color:var(--ink); background:var(--cream2); border:1px solid var(--line); border-radius:14px; overflow:hidden; padding:0 }
+.altc:active{ transform:translateY(1px) }
+.altc-th{ position:relative; width:88px; flex:0 0 auto; overflow:hidden }
+.altc-th svg{ width:100%; height:100%; display:block; position:absolute; inset:0 }
+.altc-b{ padding:11px 12px 12px; flex:1; min-width:0 }
+.altc-b h3{ font-size:15px; line-height:1.2 }
+.altc-arr{ color:var(--teal); font-size:12px }
+.altc-meta{ font-size:11.5px; color:var(--teal); font-weight:700; margin-top:3px }
+.altc-why{ font-size:12.5px; line-height:1.45; color:var(--ink-soft); margin:6px 0 0 }
+
+/* ---- DAG-NAVIGASJON ---- */
+.daynav{ display:flex; align-items:stretch; gap:10px; margin-top:30px }
+.daynav-btn{ flex:1; display:flex; align-items:center; justify-content:center; text-align:center; text-decoration:none; background:var(--green); color:var(--ink); font-family:var(--serif); font-weight:700; font-size:14.5px; padding:14px 8px; border-radius:14px; box-shadow:var(--shadow) }
+.daynav-home{ flex:0 0 auto; display:flex; align-items:center; justify-content:center; width:52px; text-decoration:none; background:var(--cream2); border:1px solid var(--line); border-radius:14px; font-size:20px; color:var(--ink) }
+.daynav-btn:active,.daynav-home:active{ transform:translateY(1px) }
+
+/* ---- PRAKTISK-SIDE ---- */
+.page-head{ display:flex; align-items:center; gap:12px; padding:20px 18px 6px; position:relative }
+.page-head .d-back{ position:static; width:42px; height:42px; border-radius:50%; background:var(--cream2); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow:var(--shadow) }
+.page-head h1{ font-size:26px }
+.page-body{ padding:6px 16px 8px }
+.checkwrap{ display:flex; flex-direction:column; gap:14px; padding:8px 2px 4px }
