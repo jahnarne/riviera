@@ -215,7 +215,7 @@
         <li>🛤️ Foretrekk tog/båt der det går — mindre stress med barn enn bil og parkering.</li>
         <li>🧺 Marché Forville som daglig base for picnic og hjemmemiddag ved bassenget.</li>
         <li>🌡️ Hold dagene fleksible — 3-åring + julivarme styrer tempoet.</li>
-        <li>🎆 14. juli (tir) er nasjonaldag: stort fyrverkeri i Cannes — ta med piknik på Croisette.</li>
+        <li>🎆 14. juli (tir): fyrverkeri i Cannes <strong>kl. 23:00</strong> (bekreftet) — piknik på Croisette fra ~21:30. Parker P Gare/Ferrage el. République, aldri sjøfronten.</li>
       </ul>
     </div>
     <div class="search"><span>🔍</span><input id="q" placeholder="Søk steder, mat, dagsturer…" oninput="render()"></div>
@@ -298,8 +298,8 @@ const PERLER = [
    u:"https://www.randofamille-cotedazur.fr/croix-des-gardes-cannes/"},
   {z:"cannes",n:"14. juli – fyrverkeri i Cannes",a:"Baie de Cannes · foran Palais des Festivals",f:"bekreftet",k:"delvis",
    why:"Nasjonaldagen åpner Cannes' internasjonale fyrverkeri-festival (Festival d'Art Pyrotechnique). Avfyres fra lektere ~400 m fra land, med musikk kringkastet langs Croisette. Gratis og spektakulært.",
-   tips:"Starter når det blir mørkt, ca. kl. 22:00 (bekreft eksakt tid på festival-pyrotechnique-cannes.com nær avreise — noen kilder oppgir 22:30/23:00). Beste plass: Croisette og de offentlige strendene for full effekt + musikk. Roligere utsikt: Le Suquet-høyden, Vieux Port, eller fra en båt i bukta. Kom 1–1,5 t før for plass; gater og parkering stenges av.",
-   pr:"Sen kveld for en 3-åring (~22:00). Plan: rolig dag + lang siesta, tidlig piknik-middag på Croisette (legg dere til rette før 21), og finn en plass med enkel barnevogn-retning hjem. Bor dere sentralt kan dere gå rett hjem etterpå; ellers kan én voksen ta 3-åringen hjem hvis det blir for sent.",
+   tips:"14. juli starter showet kl. 23:00 (bekreftet på festival-pyrotechnique-cannes.com — øvrige festivalkvelder kl. 22:00), varighet ~25 min. Beste plass: Croisette og de offentlige strendene for full effekt + musikk. Roligere utsikt: Le Suquet-høyden, Vieux Port, eller fra en båt i bukta. Kom 1–1,5 t før for plass; gater og parkering stenges av.",
+   pr:"Meget sen kveld (start 23:00!). Vår plan: én voksen + 3-åringen blir hjemme; resten kjører inn ~20:30 og parkerer P Gare/Ferrage eller P République (sjøfront-parkeringene stenges/låses 19:30–24, P Palais holder stengt). Plass på stranda fra ~21:30, hjem via Bd Carnot → Le Cannet. Alternativ: tog fra Golfe-Juan-Vallauris (7 min) — retur ~23:45 blir stappfull.",
    u:"https://www.festival-pyrotechnique-cannes.com/en/practical-info/"},
 
   {z:"nice",n:"Vieux Nice + Cours Saleya",a:"Nice · gamlebyen",f:"bekreftet",k:"delvis",
@@ -1251,22 +1251,80 @@ const ALL = [
 ].map((x,i)=>({...x, id:i, wiki:WIKI[x.n]||null, ll:(GEO[x.n]||null), img:(IMG[x.n]||null), gallery:(GALLERY[x.n]||null)}));
 const byName = {}; ALL.forEach(x=>{ byName[x.n]=x; });
 
-// Ukesplan — fleksible dagforslag (trykk på en dagstur for å åpne den)
+// Ukesplan — PRI 1-PLAN (låst juli 2026). Trykk på en dagstur for detaljer.
 const WEEK = [
   {day:"Man",date:"13. juli",tag:"Ankomst",title:"Ankomst kl. 19 — slå dere til ro",
    note:"Hent leiebil og handle litt. Eventuelt en kort kveldstur i Le Suquet og middag i Cannes.",mods:["2 · Cannes til fots"]},
-  {day:"Tir",date:"14. juli",tag:"Cannes + fyrverkeri",title:"Lérins-øytur + Cannes + fyrverkeri",
-   note:"Alt bilfritt og lokalt. Ta øya om formiddagen (tidlig ferge), hvile/basseng midt på dagen, og rusl Le Suquet før piknik på Croisette + fyrverkeri ca. kl. 22. Lang dag for de minste — hold siestaen hellig.",mods:["1 · Lérins-øydag","2 · Cannes til fots","14. juli – fyrverkeri i Cannes"]},
-  {day:"Ons",date:"15. juli",tag:"Saint-Tropez",title:"Saint-Tropez (kjør + ferge)",
-   note:"Start tidlig. Kjør til Sainte-Maxime (parker «La Fourmi») og ta Bateaux Verts-shuttlen 15 min over bukta — unngå å kjøre helt inn til St-Tropez i juli. Lang dag.",mods:["19 · Saint-Tropez (kjør + båt)","20 · Port Grimaud + Sainte-Maxime"]},
-  {day:"Tor",date:"16. juli",tag:"Hviledag",title:"Basseng/strand — eller Verdon hvis dere vil",
-   note:"Etter to tunge dager: helst en ekte basseng-/stranddag hjemme. Bare hvis alle er gira: storutflukt til Verdon (start 07:30, 2–2,5 t hver vei). Uka har ellers ingen pust.",mods:["21 · Verdon-canyon + turkis innsjø","9b · Cap d'Antibes + La Plage du Cap"]},
-  {day:"Fre",date:"17. juli",tag:"Nice + Èze",title:"Nice — marked & socca, + Èze",
-   note:"Tog ~35 min. Ta Èze før kl. 10 (før folkemengdene) eller på vei hjem. Museer i Nice er stengt tirsdag, så fredag passer fint.",mods:["5 · Vieux Nice — marked & socca","13 · Kornisjene øst: Èze + Villefranche"]},
-  {day:"Lør",date:"18. juli",tag:"Monaco + Menton",title:"Monaco + Menton (lang østdag)",
-   note:"Ukas lengste dag (~1t10–1t20 tog hver vei) — ta høydepunkter. Monaco på formiddagen: bilsamlingen, vaktskifte kl. 11:55, Casino-plassen. Så 10-min-toget videre til Menton for gamlebyen, den gule trappa og en rolig bade-/solnedgangsavslutning på Plage des Sablettes.",mods:["12 · Monaco-dagen","24 · Menton — sitronbyen (lang dagstur)"]},
-  {day:"Søn",date:"19. juli",tag:"Antibes",title:"Antibes — marked, gamleby & strand",
-   note:"Nær og lett før hjemreise. Tog ~12 min. Marché Provençal tidlig, Picasso-museet (stengt mandag), og bad på Salis/Ponteil.",mods:["8 · Antibes gamleby + Picasso","9 · Cap d'Antibes — strand & fyr"]},
+  {day:"Tir",date:"14. juli",tag:"Cannes + fyrverkeri",title:"Lérins-øytur + siesta + fyrverkeri kl. 23",
+   note:"NB: 14. juli starter fyrverkeriet kl. 23:00 (bekreftet, festival-pyrotechnique-cannes.com) — ikke 22. Hold siestaen hellig. Kvelden i to lag: én voksen + 3-åringen blir hjemme, resten ser showet fra Croisette-stranda.",
+   plan:["08:15 — Kjør til Cannes, parker P Laubeuf. Picnic-innkjøp på Marché Forville",
+    "09:00 — Første ferge til Île Sainte-Marguerite (kjøp billetter online)",
+    "09:30 — Skogstur, grunne viker på sørsiden, picnic i skyggen, evt. Fort Royal",
+    "13:30 — Ferge tilbake (før ettermiddagstrengselen), kjør hjem",
+    "14:30 — Hellig siesta + basseng til ~20:00",
+    "20:30 — Kveldslaget kjører inn: parker P Gare/Ferrage eller P République (IKKE sjøfronten — P Palais m.fl. stengt/innelåst 19:30–24)",
+    "21:30 — Finn plass på Croisette-stranda, sen picnic",
+    "23:00 — Fyrverkeri ~25 min → gå mot strømmen til bilen, hjem via Bd Carnot"],
+   mods:["1 · Lérins-øydag","2 · Cannes til fots"]},
+  {day:"Ons",date:"15. juli",tag:"Saint-Tropez",title:"Saint-Tropez + Port Grimaud (bil + båt)",
+   note:"Pass Découverte (24 €/voksen, 13,90 €/barn 4–11, gratis under 4) dekker hele båttrekanten — gjelder ikke tir/lør, men onsdag er ok. 13-åringen besøker kompis i Sainte-Maxime. Middag: La Maison Bleue — MÅ reserveres.",
+   plan:["08:10 — Avreise. A8 → avkjøring Le Muy → D25",
+    "09:25 — Sainte-Maxime: lever 13-åringen, parker gratis «La Fourmi» (RN98)",
+    "10:00 — Båt til Saint-Tropez (kjøp Pass Découverte ved kiosken, oppmøte 20 min før)",
+    "10:20 — Vieux Port → La Ponche-kvarteret → klokketårnet",
+    "11:15 — Citadellet: påfugler, panorama, plass til å løpe",
+    "12:15 — Lunsj Le Café på Place des Lices → Tarte Tropézienne til dessert",
+    "14:10 — Båt Vieux Port → Port Grimaud (25 min)",
+    "14:35 — Kanalbåt-tur (~20 min) + gelato + rusle langs kanalene",
+    "16:15 — Båt PG → St-Tropez, bytte, 17:00 båt → Sainte-Maxime (17:20)",
+    "17:30 — Hent 13-åringen, evt. dukkert ved bystranda",
+    "18:30 — Middag La Maison Bleue, 48 Rue Paul Bert (reserver: +33 4 94 96 51 92)",
+    "19:45 — Kjør hjem — rushet på D25/A8 er over. Hjemme ~21:00"],
+   mods:["19 · Saint-Tropez (kjør + båt)","20 · Port Grimaud + Sainte-Maxime"]},
+  {day:"Tor",date:"16. juli",tag:"Grasse + basseng",title:"Grasse halvdag — parfyme, så basseng",
+   note:"Ukas pustehull. Galimard-atelieret MÅ forhåndsbookes (10:00-økten, fra 8 år, 52 €/barn u15 inkl. 100 ml egen parfyme). NB: parfymeflaskene tåler ikke stekende bil — ta dem med inn til lunsj.",
+   plan:["09:00 — Avreise (30–40 min, mot trafikkstrømmen)",
+    "10:00 — Delt gruppe: 10- og 13-åringen + én voksen på Galimard-atelieret. Den andre voksne + 3-åringen: Place aux Aires-markedet + Fragonard gratis omvisning",
+    "12:00 — Lunsj Le Gazan i gamlebyen",
+    "13:30 — Kjør hjem",
+    "14:15 — Basseng resten av dagen. Grilling, tidlig kveld — fredag starter tidlig"],
+   mods:["15 · Parfyme i Grasse"]},
+  {day:"Fre",date:"17. juli",tag:"Èze + Nice",title:"Èze tidlig, så hel dag i Nice",
+   note:"Bil er riktig: P-plassen ved Èze-porten fylles 09:30–10. Etterpå ned til Nice, parker P Port Lympia (rett ved Chez Pipo). HUSK: badetøy til alle + skiftetøy til 3-åringen (vannspeilet). Middag L'Escalinada — reserver.",
+   plan:["07:45 — Avreise, Moyenne Corniche mot Èze",
+    "08:45 — Parker ved landsbyporten. Smugene + Jardin Exotique før folkemengdene (bær 3-åringen)",
+    "11:00 — Evt. Fragonard-fabrikken ved foten (gratis omvisning, kjølig)",
+    "11:30 — Kjør Basse Corniche ned til Nice → Parking Port Lympia",
+    "11:55 — Chez Pipo ved åpning kl. 12 (socca ~3–4 €) — køen kommer fort",
+    "13:00 — Vieux Nice: L'Atelier des Jouets (spilledåse), Alziari, Place Rossetti + Fenocchio-gelato",
+    "14:30 — Gratis heis opp Colline du Château: utsikt, foss, skygge, hvil",
+    "16:00 — Promenade du Paillon: vannspeilet — plasketid for 3-åringen",
+    "17:30 — Bad for de store: Coco Beach/La Réserve (svaberg med stiger — ikke for 3-åringen)",
+    "18:45 — Middag L'Escalinada, 22 rue Pairolière (reserver) — alt. Chez Davia",
+    "20:15 — Til bilen og hjem — hjemme ~21:00"],
+   mods:["13 · Kornisjene øst: Èze + Villefranche","5 · Vieux Nice — marked & socca"]},
+  {day:"Lør",date:"18. juli",tag:"Monaco + Menton",title:"Monaco formiddag → Menton: bad og middag",
+   note:"Ren togdag — bilen står på Golfe-Juan-stasjonen. Kjøp akvarie-billetter online (hopp over køen). Avslutt i Menton: roligere og billigere enn Monaco på kvelden. Sjekk togretur ~20:30–21 i SNCF Connect når dere booker middag.",
+   plan:["08:00 — Bil 5 min til Golfe-Juan-Vallauris, tog østover (~1 t)",
+    "10:00 — Musée Océanographique ved åpning: hai, korallbasseng, touch-pools (22,50/14 €, gratis u4)",
+    "11:55 — Vaktskiftet ved Fyrstepalasset — vær der 11:45",
+    "12:15 — Lunsj Place d'Armes-markedet: Chez Roger-socca + Maison des Pâtes. Is: L'Atelier du Glacier",
+    "13:30 — Prinsens bilsamling ved Port Hercule (10/5 €, kjølig) eller Jardins Saint-Martin",
+    "14:45 — Tog Monaco → Menton (10 min)",
+    "15:15 — Plage des Sablettes: bad i grunt, rolig vann + strandbiblioteket rett ved (åpent lør)",
+    "17:30 — Gamlebyen: de gule Rampes Saint-Michel (bær 3-åringen), basilikaen, citronade",
+    "19:00 — Middag JR Bistronomie i gamlebyen (reserver)",
+    "20:45 — Tog direkte vestover (~1 t 20). Hjemme ~22:15 — 3-åringen sover i vogna"],
+   mods:["12 · Monaco-dagen","24 · Menton — sitronbyen (lang dagstur)"]},
+  {day:"Søn",date:"19. juli",tag:"Antibes",title:"Antibes — marked, Picasso & strand",
+   note:"Myk landing før hjemreise. God tid på markedet. Book Le Safranier (søndagslunsj i juli, fem personer) — backup: Bistrot Margaux. Kveld: pakking.",
+   plan:["08:45 — Tog 12 min fra Golfe-Juan (eller bil: P Pré-aux-Pêcheurs ved gamlebyen)",
+    "09:15 — Marché Provençal i ro og mak (beste utvalg før 11) + Veziano/La Frenglish-bakverk. Kaffe: Nomads",
+    "11:00 — Musée Picasso i Château Grimaldi (gratis under 18, ~45 min)",
+    "12:30 — Lunsj Le Safranier på det stille torget (reserver!)",
+    "14:15 — Plage de la Salis/Ponteil: grunt og varmt vann + Amarena-gelato på veien",
+    "16:30 — Hjem: basseng, pakking, enkel middag"],
+   mods:["8 · Antibes gamleby + Picasso","9 · Cap d'Antibes — strand & fyr"]},
   {day:"Man",date:"20. juli",tag:"Avreise",title:"Avreise fra Nice kl. 10:30",
    note:"Pakk og dra tidlig. Eventuelt et siste stopp på Marché Forville før dere kjører.",mods:[]},
 ];
@@ -1380,34 +1438,35 @@ function toggleMapView(){ state.mapView=!state.mapView; render(); }
 
 // Bestillingssjekkliste
 const CHECKLIST = [
-  {group:"📌 Book i god tid (kan selge ut)", items:[
-    "Parfyme-atelier i Grasse (Galimard/Molinard)",
-    "Pedalo/kano ved Pont du Galetas (boutique.moustiers.fr)",
-    "Verdon-overnatting (hvis to-dagers utflukt)",
-    "Saint-Tropez: direkte båt eller Bateaux Verts shuttle",
-    "Middag Aux Bons Enfants — kun kontant (Cannes)",
-    "Middag L'Escalinada (Nice, lukket onsdag)",
-    "Middag L'Auberge des Maures (Saint-Tropez)",
-    "Sainte-Agnès Fort Maginot (SMS-reservasjon 48 t før)",
+  {group:"📌 Book nå — låst plan", items:[
+    "Lérins-ferge tir 14/7 kl. 09:00 — billetter online (horizon-lerins.com)",
+    "La Maison Bleue, Sainte-Maxime — ons 15/7 kl. 18:30 (+33 4 94 96 51 92)",
+    "Galimard Studio des Fragrances — tor 16/7 kl. 10:00, 2 barn + ledsager (galimard.com)",
+    "L'Escalinada, Nice — fre 17/7 kl. 18:45 (alt. Chez Davia)",
+    "Musée Océanographique Monaco — billetter online for lør 18/7",
+    "JR Bistronomie, Menton — lør 18/7 kl. 19:00",
+    "Le Safranier, Antibes — søn 19/7 kl. 12:30 (backup: Bistrot Margaux)",
   ]},
-  {group:"✅ Bekreft åpningstider nær avreise", items:[
-    "Villa Ephrussi åpent 11. juli (motstridende kilder)",
-    "Jardin Exotique Monaco — juli-tider/pris",
-    "Marché Provençal Antibes + Garoupe-fyret",
-    "La Tonnelle (Saint-Honorat) — gjenåpning 2026",
-    "Le Jardin (Cannes) — adresse / hvilket sted",
-    "Ring små restauranter 2–3 dager før (congés)",
-  ]},
-  {group:"🌡️ Vær & sesong", items:[
-    "Lavendel-status Valensole (sjekk uke 1–2 juli)",
-    "Brannfare/veistenginger Verdon (var.gouv.fr)",
-    "Vind for Cap d'Antibes-sti og strender",
+  {group:"✅ Bekreft nær avreise", items:[
+    "Fyrverkeri 14/7: tid (offisielt 23:00) + gateavsperringer i Cannes",
+    "Togretur fra Menton lør kveld ~20:30–21:00 (SNCF Connect)",
+    "Bateaux Verts-tider onsdag (brochure 2026: hvert 15. min fra Ste-Maxime)",
+    "Galimard-flaskene: hent kvittering/merking — og aldri la parfymen ligge i varm bil",
+    "Ring små restauranter 2–3 dager før (congés/stengedager)",
   ]},
   {group:"🎒 Pakke & hverdag", items:[
-    "Kontanter (Aux Bons Enfants, markeder)",
-    "Bæremeis for landsbyer (brostein/trapper)",
-    "Solhatt, solkrem og vannflasker",
-    "14. juli: piknik + fyrverkeri på Croisette",
+    "Badetøy + håndklær FREDAG (Nice: Coco Beach) og LØRDAG (Menton: Sablettes)",
+    "Skiftetøy til 3-åringen fredag (vannspeilet på Promenade du Paillon)",
+    "Kontanter (markeder, PhilCat, småsteder)",
+    "Bæremeis: Èze, Le Suquet, Menton-trappa, Grasse gamleby",
+    "Solhatt, solkrem, vannflasker, myggmiddel",
+    "Tir 14/7: piknik-pledd, hodelykt og vogn til fyrverkerikvelden",
+  ]},
+  {group:"🌡️ Hvis planen endres", items:[
+    "Verdon: pedalo Pont du Galetas (base-nautique-etoile.fr) + brannfare (var.gouv.fr)",
+    "Villa Ephrussi åpningstider (motstridende kilder)",
+    "Vind for Cap d'Antibes-stier og strender",
+    "Le Café de France, Ste-Maxime — står som midlertidig stengt",
   ]},
 ];
 let checks = loadChecks();
@@ -1637,6 +1696,7 @@ function render(){
         <div class="dayhead"><span class="dnum">${d.day}</span><span class="ddate">${d.date}</span>${d.tag?`<span class="dtag">${d.tag}</span>`:''}</div>
         <div class="dtitle">${d.title}</div>
         ${d.note?`<p class="dnote">${d.note}</p>`:''}
+        ${d.plan&&d.plan.length?`<div class="tl">${d.plan.map(r=>{const i=r.indexOf(" — ");const t=i>0?r.slice(0,i):"";const x=i>0?r.slice(i+3):r;return `<div class="tlrow"><div class="tlt">${t}</div><div class="tld">${x}</div></div>`;}).join("")}</div>`:''}
         ${d.mods&&d.mods.length?`<div class="dmods">${d.mods.map(m=>`<span class="dmod" data-n="${m}" onclick="openDetailByName(this.dataset.n)">${m} ›</span>`).join("")}</div>`:''}
       </div>`).join("");
     return;
