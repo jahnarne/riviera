@@ -339,7 +339,7 @@ function phaseIcon(k){
   return 'schedule';
 }
 function planIcon(text){
-  const t=(text||"").toLowerCase();
+  const t=(typeof text==="string"?text:"").toLowerCase();
   if(/ferge|båt|boat/.test(t)) return 'directions_boat';
   if(/tog|train|sncf/.test(t)) return 'train';
   if(/parker|park\b/.test(t)) return 'local_parking';
@@ -427,7 +427,7 @@ function renderProgram(){
     const n=i+1, hero=d.hero?byName[d.hero]:null;
     const ns=(d.sights||[]).length, nf=(d.food||[]).length;
     const first=n===1, last=n===WEEK.length;
-    const circleIcon=first?'flight_land':last?'flight_takeoff':planIcon((d.plan&&d.plan[0])||d.title);
+    const circleIcon=first?'flight_land':last?'flight_takeoff':planIcon((d.plan||[]).find(s=>typeof s==="string")||d.title);
     const chips=[ns?`${icon('explore','text-[18px]')}<span class="text-label-sm">${ns} severdighet${ns>1?'er':''}</span>`:null,
                  nf?`${icon('restaurant','text-[18px]')}<span class="text-label-sm">${nf} spisested${nf>1?'er':''}</span>`:null]
                  .filter(Boolean).map(c=>`<div class="flex items-center gap-1 text-on-surface-variant">${c}</div>`).join("");
