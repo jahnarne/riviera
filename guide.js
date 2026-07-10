@@ -327,6 +327,17 @@ function splitStep(x){
   }
   return idx<0 ? [x,""] : [x.slice(0,idx), x.slice(idx+2)];
 }
+function phaseIcon(k){
+  const s=(k||"").toLowerCase();
+  if(s.indexOf("tidlig morgen")>=0) return 'wb_twilight';
+  if(s.indexOf("morgen")>=0) return 'wb_twilight';
+  if(s.indexOf("formiddag")>=0) return 'wb_sunny';
+  if(s.indexOf("midt")>=0) return 'wb_sunny';
+  if(s.indexOf("lunsj")>=0) return 'restaurant';
+  if(s.indexOf("ettermiddag")>=0) return 'beach_access';
+  if(s.indexOf("kveld")>=0) return 'nightlight';
+  return 'schedule';
+}
 function planIcon(text){
   const t=(text||"").toLowerCase();
   if(/ferge|båt|boat/.test(t)) return 'directions_boat';
@@ -521,6 +532,14 @@ function renderDay(n){
   const next=n<WEEK.length?`dag-${n+1}.html`:"praktisk.html";
 
   const timeline=(d.plan||[]).map(r=>{
+    if(r && r.type==="phase"){
+      return `<div class="relative flex gap-5 items-start">
+      <div class="w-9 h-9 rounded-full bg-secondary text-white flex items-center justify-center shrink-0 z-10 shadow border-2 border-background">${icon(phaseIcon(r.kicker),'text-[18px]')}</div>
+      <div class="bg-ivory p-5 rounded-xl shadow-sm border border-sand flex-1">
+        <span class="font-label-sm text-label-sm text-secondary block mb-1">${r.kicker}</span>
+        <h3 class="font-headline-md text-[21px] text-on-surface leading-snug">${r.title}</h3>
+        ${r.desc?`<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mt-1">${r.desc}</p>`:''}</div></div>`;
+    }
     const i=r.indexOf(" — "); const t=i>0?r.slice(0,i):""; const x=i>0?r.slice(i+3):r;
     const [head,desc]=splitStep(x);
     return `<div class="relative flex gap-5 items-start">
