@@ -377,7 +377,7 @@ function renderDay(n){
   const inner=`<main class="pb-28">
     <!-- HERO -->
     <section class="relative w-full h-[440px] overflow-hidden">
-      ${heroLayers(hero)}
+      ${hero ? heroLayers(hero) : `<div class="ph-scene absolute inset-0">${scene('cannes',n,null,null)}</div>`}
       <div class="absolute inset-0 z-[2] bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
       <a href="programmet.html" class="absolute top-20 left-4 z-[4] w-11 h-11 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-on-surface shadow">${icon('arrow_back')}</a>
       <div class="absolute bottom-0 inset-x-0 z-[3] p-margin-mobile text-white">
@@ -511,11 +511,15 @@ function renderPraktisk(){
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12">
       <div class="md:col-span-2 relative overflow-hidden rounded-xl h-56 shadow-lg">
         <div class="ph-scene absolute inset-0 z-0">${scene('cannes',3,null,null)}</div>
-        <div class="absolute inset-0 z-[2]" style="background:linear-gradient(to top, rgba(57,46,38,.85), rgba(57,46,38,.15) 60%, transparent)"></div>
-        <div class="absolute bottom-0 left-0 z-[3] p-6">
-          <h3 class="font-headline-md text-headline-md text-white mb-1">${base.name}</h3>
+        ${base.img?`<img class="ph" src="${base.img}" alt="${base.name}" referrerpolicy="no-referrer" onload="this.classList.add('show')" onerror="this.remove()">`:''}
+        <div class="absolute inset-0 z-[2]" style="background:linear-gradient(to top, rgba(45,36,30,.92) 0%, rgba(45,36,30,.55) 45%, rgba(45,36,30,.15) 100%)"></div>
+        <div class="absolute bottom-0 left-0 right-0 z-[3] p-6">
+          <h3 class="font-headline-md text-headline-md text-white mb-1" style="text-shadow:0 1px 6px rgba(0,0,0,.5)">${base.name}</h3>
           <p class="text-white/85 font-body-md mb-4">${base.addr}</p>
-          <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(base.addr)}" target="_blank" rel="noopener" class="bg-terracotta text-white font-label-md px-6 py-2 rounded-full inline-flex items-center gap-2">Vis base ${icon('open_in_new','text-sm')}</a>
+          <div class="flex flex-wrap gap-2">
+            ${base.url?`<a href="${base.url}" target="_blank" rel="noopener" class="bg-terracotta text-white font-label-md px-5 py-2 rounded-full inline-flex items-center gap-2">Åpne i Airbnb ${icon('open_in_new','text-sm')}</a>`:''}
+            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(base.addr)}" target="_blank" rel="noopener" class="bg-white/15 backdrop-blur border border-white/40 text-white font-label-md px-5 py-2 rounded-full inline-flex items-center gap-2">Kart ${icon('map','text-sm')}</a>
+          </div>
         </div>
       </div>
       <div class="bg-surface-container-high rounded-xl p-6 flex flex-col justify-between shadow-sm">
