@@ -165,8 +165,10 @@ function buildPlaceMap(x, elId){
 /* ---------------- FELLES CHROME ---------------- */
 function topBar(){
   return `<header class="fixed top-0 inset-x-0 z-50 h-16 bg-background/95 backdrop-blur-sm border-b border-sand flex items-center justify-between px-margin-mobile">
-    <a href="programmet.html" class="text-terracotta flex items-center hover:opacity-80 transition-opacity">${icon('menu')}</a>
-    <a href="index.html" class="font-headline-lg-mobile text-headline-lg-mobile text-terracotta font-bold">Rivieraen 2026</a>
+    <div class="flex items-center gap-3">
+      <a href="programmet.html" class="text-terracotta flex items-center hover:opacity-80 transition-opacity">${icon('menu')}</a>
+      <a href="index.html" class="font-headline-lg-mobile text-headline-lg-mobile text-terracotta">Rivieraen 2026</a>
+    </div>
     <a href="praktisk.html" class="text-terracotta flex items-center hover:opacity-80 transition-opacity">${icon('account_circle')}</a>
   </header>`;
 }
