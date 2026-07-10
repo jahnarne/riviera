@@ -180,7 +180,7 @@ function bottomNav(active){
   return `<nav class="fixed bottom-0 inset-x-0 z-50 flex justify-around items-center px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))] bg-surface border-t border-sand shadow-[0_-6px_24px_rgba(180,83,9,0.06)] rounded-t-xl">
     ${item('index.html','home','Hjem','home')}
     ${item('programmet.html','calendar_today','Plan','plan')}
-    ${item('arkiv.html','explore','Oppdag','discover')}
+    ${item('reise.html','directions_transit','Reise','reise')}
     ${item('praktisk.html','info','Info','info')}
   </nav>`;
 }
@@ -245,7 +245,7 @@ function renderHome(){
   const hero=day.hero?byName[day.hero]:null;
   const FEATURED=["Saint-Tropez gamleby & La Ponche","Monaco – Le Rocher & akvariet","Èze village","Vieux Nice + Cours Saleya"]
     .map(n=>byName[n]).filter(Boolean);
-  const preview=WEEK.slice(0,4);
+  const preview=WEEK;
 
   const inner=`<main class="pb-28">
     <!-- HERO -->
@@ -302,11 +302,11 @@ function renderHome(){
         <div class="relative space-y-10 pl-2">
           <div class="absolute left-[19px] top-3 bottom-3 dotted-v opacity-50"></div>
           ${preview.map((d,i)=>`<a href="dag-${i+1}.html" class="flex gap-6 relative z-10">
-            <div class="w-10 h-10 rounded-full ${i===0?'bg-terracotta text-white':'bg-white border-2 border-terracotta text-terracotta'} flex items-center justify-center font-label-md flex-shrink-0 shadow-sm">${parseInt(d.date)}</div>
+            <div class="w-10 h-10 rounded-full ${i+1===di?'bg-terracotta text-white':'bg-white border-2 border-terracotta text-terracotta'} flex items-center justify-center font-label-md flex-shrink-0 shadow-sm">${parseInt(d.date)}</div>
             <div><h5 class="font-headline-md text-[20px] leading-tight mb-1">${d.tag||d.title}</h5>
               <p class="text-on-surface-variant">${firstSentence(d.note||d.title)}</p></div></a>`).join("")}
         </div>
-        <a href="programmet.html" class="mt-10 text-terracotta font-label-md text-label-md flex items-center gap-2">Se hele reiseplanen for ${WEEK.length} dager ${icon('expand_more')}</a>
+        <a href="programmet.html" class="mt-10 text-terracotta font-label-md text-label-md flex items-center gap-2">Se reiseruten med bilder ${icon('arrow_forward','text-[18px]')}</a>
       </div>
     </section>
   </main>`;
@@ -353,6 +353,65 @@ function renderProgram(){
   document.title="Programmet — Rivieraen 2026";
 }
 
+/* ================= REISEINFO-KORT (fly + leiebil) ================= */
+function renderTravel(d){
+  if(!d.travel||!d.travel.length) return "";
+  const flightCard=f=>`
+    <div class="bg-white border border-sand rounded-xl p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">${icon('flight_takeoff','text-terracotta')}<span class="font-headline-md text-[19px]">${f.airline}</span></div>
+        <span class="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full font-label-sm text-label-sm">Ref ${f.ref}</span>
+      </div>
+      <div class="flex items-end justify-between gap-3">
+        <div><div class="font-headline-lg text-[30px] leading-none">${f.fromCode}</div><div class="text-label-sm text-on-surface-variant mt-1">${f.fromCity}${f.dep?' · '+f.dep:''}</div></div>
+        <div class="flex-1 pb-2 min-w-0">
+          ${f.dur?`<div class="text-center text-label-sm text-on-surface-variant mb-1 truncate">${f.dur}</div>`:'<div class="mb-1 h-[16px]"></div>'}
+          <div class="relative"><div class="border-t-2 border-dotted border-outline-variant"></div><span class="material-symbols-outlined absolute left-1/2 -translate-x-1/2 -top-[11px] bg-white px-1 text-terracotta text-[18px]">flight</span></div>
+        </div>
+        <div class="text-right"><div class="font-headline-lg text-[30px] leading-none">${f.toCode}</div><div class="text-label-sm text-on-surface-variant mt-1">${f.toCity}${f.arr?' · '+f.arr:''}</div></div>
+      </div>
+      <div class="flex flex-wrap gap-x-6 gap-y-1 text-label-sm text-on-surface-variant mt-4 pt-3 border-t border-sand">
+        <span class="inline-flex items-center gap-1.5">${icon('flight','text-[16px]')} ${f.flight}</span>
+        <span class="inline-flex items-center gap-1.5">${icon('calendar_today','text-[16px]')} ${f.date}</span>
+        ${f.seats?`<span class="inline-flex items-center gap-1.5">${icon('airline_seat_recline_normal','text-[16px]')} Seter: ${f.seats}</span>`:''}
+      </div>
+    </div>`;
+  const carCard=c=>`
+    <div class="bg-white border border-sand rounded-xl p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">${icon('directions_car','text-terracotta')}<span class="font-headline-md text-[19px]">${c.firma} leiebil</span></div>
+        <span class="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full font-label-sm text-label-sm">Ref ${c.ref}</span>
+      </div>
+      ${c.bil?`<p class="font-body-md text-on-surface mb-3">${c.bil}${c.driver?` · sjåfør ${c.driver}`:''}</p>`:''}
+      ${c.note?`<p class="font-body-md text-on-surface-variant mb-3">${c.note}</p>`:''}
+      ${c.pickup?`<div class="flex items-start gap-2 mb-2"><span class="material-symbols-outlined text-secondary text-[18px] mt-0.5 shrink-0">login</span><div><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Hent</span><br><span class="font-body-md">${c.pickup}</span></div></div>`:''}
+      ${c.ret?`<div class="flex items-start gap-2 mb-3"><span class="material-symbols-outlined text-secondary text-[18px] mt-0.5 shrink-0">logout</span><div><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Lever</span><br><span class="font-body-md">${c.ret}</span></div></div>`:''}
+      ${c.detaljer?`<p class="text-label-sm text-on-surface-variant leading-relaxed">${c.detaljer}</p>`:''}
+      ${c.betaling?`<p class="text-label-sm text-on-surface-variant leading-relaxed mt-1">${c.betaling}</p>`:''}
+      ${c.url?`<a href="${c.url}" target="_blank" rel="noopener" class="mt-4 inline-flex items-center gap-2 border-2 border-terracotta text-terracotta font-label-md text-label-md px-5 py-2 rounded-full">Administrer booking ${icon('open_in_new','text-[16px]')}</a>`:''}
+    </div>`;
+  const boligCard=()=>`
+    <div class="bg-white border border-sand rounded-xl p-5 shadow-sm">
+      <div class="flex items-center gap-2 mb-3">${icon('home','text-terracotta')}<span class="font-headline-md text-[19px]">Airbnb · vår base</span></div>
+      <p class="font-body-md text-on-surface mb-4">${HOME.addr}</p>
+      <div class="flex flex-wrap gap-2">
+        ${HOME.url?`<a href="${HOME.url}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-terracotta text-white font-label-md text-label-md px-5 py-2 rounded-full">Åpne i Airbnb ${icon('open_in_new','text-[16px]')}</a>`:''}
+        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(HOME.addr)}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 border-2 border-terracotta text-terracotta font-label-md text-label-md px-5 py-2 rounded-full">Google Maps ${icon('map','text-[16px]')}</a>
+      </div>
+    </div>`;
+  const eatsCard=(c)=>`
+    <div class="bg-white border border-sand rounded-xl p-5 shadow-sm">
+      <div class="flex items-center gap-2 mb-2">${icon('restaurant','text-terracotta')}<span class="font-headline-md text-[19px]">Middag: Uber Eats</span></div>
+      <p class="font-body-md text-on-surface-variant mb-4">Bestill på flyet eller flyplassen, så kommer maten omtrent når dere er fremme i Vallauris.</p>
+      <a href="${c.url||'https://www.ubereats.com/no'}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-terracotta text-white font-label-md text-label-md px-5 py-2 rounded-full">Åpne Uber Eats ${icon('open_in_new','text-[16px]')}</a>
+    </div>`;
+  const cards=d.travel.map(t=> t.type==="fly"?flightCard(t) : t.type==="bolig"?boligCard() : t.type==="ubereats"?eatsCard(t) : carCard(t)).join("");
+  return `<section class="py-8">
+    <h2 class="font-headline-md text-headline-md mb-5 flex items-center gap-3">${icon('luggage','text-terracotta')} Reiseinfo</h2>
+    <div class="space-y-4">${cards}</div>
+  </section>`;
+}
+
 /* ================= DAGSSIDE ================= */
 function renderDay(n){
   const d=WEEK[n-1];
@@ -377,7 +436,7 @@ function renderDay(n){
   const inner=`<main class="pb-28">
     <!-- HERO -->
     <section class="relative w-full h-[440px] overflow-hidden">
-      ${hero ? heroLayers(hero) : `<div class="ph-scene absolute inset-0">${scene('cannes',n,null,null)}</div>`}
+      ${hero ? heroLayers(hero) : `<div class="ph-scene absolute inset-0">${scene('cannes',n,null,null)}</div>${d.heroImg?`<img class="ph" src="${d.heroImg}" alt="Base" referrerpolicy="no-referrer" onload="this.classList.add('show')" onerror="this.remove()">`:''}`}
       <div class="absolute inset-0 z-[2] bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
       <a href="programmet.html" class="absolute top-20 left-4 z-[4] w-11 h-11 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-on-surface shadow">${icon('arrow_back')}</a>
       <div class="absolute bottom-0 inset-x-0 z-[3] p-margin-mobile text-white">
@@ -389,6 +448,7 @@ function renderDay(n){
     </section>
 
     <div class="px-margin-mobile max-w-container-max mx-auto">
+      ${renderTravel(d)}
       ${timeline?`<section class="py-10">
         <h2 class="font-headline-md text-headline-md text-on-surface-variant mb-8 flex items-center gap-3">${icon('schedule','text-terracotta')} Dagens rute</h2>
         <div class="relative space-y-6"><div class="absolute left-[17px] top-2 bottom-2 dotted-v"></div>${timeline}</div>
@@ -481,6 +541,60 @@ function renderPlace(){
   hydrate(document.getElementById("app"));
   if(x.ll) setTimeout(()=>buildPlaceMap(x,"placemap"),120);
   document.title=`${x.n} — Rivieraen 2026`;
+}
+
+/* ================= REISE (tog & parkering) ================= */
+function renderReise(){
+  const T=TRANSPORT;
+  const statusChip=(s)=>{
+    const map={
+      "booket":["bg-secondary-container text-on-secondary-container","Booket","check_circle"],
+      "kjøp":["bg-terracotta text-white","Kjøp","confirmation_number"],
+      "på stedet":["bg-tertiary-container text-on-tertiary-container","På stedet","storefront"],
+      "valgfritt":["bg-surface-container-high text-on-surface-variant","Valgfritt","more_horiz"]
+    };
+    const c=map[s]||["bg-surface-container-high text-on-surface-variant",s,"label"];
+    return `<span class="inline-flex items-center gap-1 ${c[0]} px-3 py-1 rounded-full font-label-sm text-label-sm shrink-0">${icon(c[2],'text-[14px]')} ${c[1]}</span>`;
+  };
+  const dayBadge=(d)=>`<div class="flex items-center gap-2 mb-3 flex-wrap">
+    <span class="bg-terracotta text-white font-label-sm text-label-sm px-3 py-1 rounded-full">Dag ${d.n}</span>
+    <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">${d.day} ${d.date}</span>
+    <span class="ml-auto inline-flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm">${icon(d.icon,'text-[18px] text-terracotta')} ${d.mode}</span></div>`;
+
+  const ticketsHTML=T.days.filter(d=>d.tickets.length).map(d=>`
+    <div class="bg-white border border-sand rounded-xl p-5 shadow-sm">${dayBadge(d)}
+      <div class="space-y-3">${d.tickets.map(t=>`
+        <div class="flex items-start gap-3">${statusChip(t.status)}
+          <div class="min-w-0"><p class="font-body-md text-on-surface">${t.t}</p>${t.note?`<p class="text-label-sm text-on-surface-variant mt-0.5">${t.note}</p>`:''}</div>
+        </div>`).join("")}</div></div>`).join("");
+
+  const parkHTML=T.days.filter(d=>d.parking.length).map(d=>`
+    <div class="bg-white border border-sand rounded-xl p-5 shadow-sm">${dayBadge(d)}
+      <div class="space-y-3">${d.parking.map(p=>`
+        <div class="flex items-start gap-3 ${p.warn?'bg-tertiary-container/25 -mx-2 px-2 py-2 rounded-lg':''}">
+          ${icon(p.warn?'warning':'local_parking',(p.warn?'text-terracotta':'text-secondary')+' text-[20px] shrink-0 mt-0.5')}
+          <div class="min-w-0"><p class="font-body-md font-bold text-on-surface">${p.name}</p><p class="text-label-sm text-on-surface-variant mt-0.5 leading-relaxed">${p.note}</p></div>
+        </div>`).join("")}</div></div>`).join("");
+
+  const inner=`<main class="pt-24 pb-28 px-margin-mobile max-w-container-max mx-auto">
+    <section class="mb-8 text-center">
+      <span class="font-label-sm text-label-sm text-terracotta uppercase tracking-[0.2em] mb-2 block">Transport</span>
+      <h1 class="font-headline-lg text-headline-lg mb-3">Tog & parkering</h1>
+      <p class="font-body-md text-on-surface-variant max-w-md mx-auto">${T.intro}</p>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="font-headline-md text-headline-md mb-6 flex items-center gap-3">${icon('train','text-terracotta')} Togbilletter & ferger</h2>
+      <div class="space-y-4">${ticketsHTML}</div>
+    </section>
+
+    <section>
+      <h2 class="font-headline-md text-headline-md mb-6 flex items-center gap-3">${icon('local_parking','text-terracotta')} Parkering å verifisere</h2>
+      <div class="space-y-4">${parkHTML}</div>
+    </section>
+  </main>`;
+  shell(inner,"reise");
+  document.title="Reise — Rivieraen 2026";
 }
 
 /* ================= PRAKTISK ================= */

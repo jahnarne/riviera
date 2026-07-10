@@ -1038,9 +1038,16 @@ const WEEK = [
   {day:"Man",date:"13. juli",tag:"Ankomst",title:"Ankomst kl. 21, kom i orden",
    note:"Ankomst til huset ~21:00. Ingen program, bare kom i orden. Middag: bestill Uber Eats på flyet eller flyplassen, så kommer maten omtrent når dere gjør.",mods:[],
    hero:null,
+   heroImg:"images/hus.jpg",
    sights:[],
    food:[],
-   alts:[]},
+   alts:[],
+   travel:[
+    {type:"fly",airline:"SAS",ref:"ZJZVYA",flight:"SK 4701",fromCode:"OSL",fromCity:"Oslo",toCode:"NCE",toCity:"Nice",date:"13. juli",dep:"16:40",arr:"19:40",dur:"Direktefly · 3t",seats:"7B, 7C, 7D, 7E, 7F"},
+    {type:"bil",firma:"Sixt",ref:"9735511393",bil:"Mercedes-Benz GLA eller tilsvarende",driver:"Jahn Arne Johnsen",pickup:"13.07 kl. 19:00 · Nice lufthavn, Terminal 2",ret:"20.07 kl. 11:00 · Nice lufthavn, Terminal 2",detaljer:"7 dager · basisforsikring, ansvar og 24/7 havarihjelp · inntil 1750 km (€0,85 per ekstra km) · egenandel inntil €3000",betaling:"Forskuddsbetalt €721,21. €300 depositum blokkeres på kortet ved henting.",url:"https://www.sixt.no/account/#/manage-my-booking-info"},
+    {type:"bolig"},
+    {type:"ubereats",url:"https://www.ubereats.com/no"}
+   ]},
   {day:"Tir",date:"14. juli",tag:"Cannes + fyrverkeri",title:"Lérins-øytur + siesta + fyrverkeri kl. 23",
    note:"NB: 14. juli starter fyrverkeriet kl. 23:00 (bekreftet på festival-pyrotechnique-cannes.com), ikke 22. Hold siestaen hellig. Del kvelden i to lag: én voksen og 3-åringen blir hjemme, resten ser showet fra Croisette-stranda.",
    plan:["08:15 — Kjør til Cannes, parker P Laubeuf. Kjøp pan bagnat på PhilCat (havna, kontant) til øy-lunsj. Handle kveldspicnic nå også hvis dere vil, for Marché Forville stenger 13:00",
@@ -1145,12 +1152,16 @@ const WEEK = [
    alts:[{n:"Bistrot Margaux",why:"Backup søndagslunsj hvis Chez Mô ikke passer."},
     {n:"Fort Carré",why:"Ekstra-alternativ: stjerneformet festning med utsikt like ved."},
     {n:"Nomads",why:"Kaffe/enkel bit hvis dere vil ha noe raskt etter markedet."}]},
-  {day:"Man",date:"20. juli",tag:"Avreise",title:"Avreise fra Nice kl. 10:30",
-   note:"Pakk og dra tidlig. Eventuelt et siste stopp på Marché Forville før dere kjører.",mods:[],
+  {day:"Man",date:"20. juli",tag:"Avreise",title:"Avreise fra Nice kl. 10:35",
+   note:"Pakk og dra tidlig. Lever leiebilen på Nice lufthavn (Terminal 2) før innsjekk. Eventuelt et siste stopp på Marché Forville hvis tiden strekker til.",mods:[],
    hero:"Marché Forville",
    sights:["Marché Forville"],
    food:[],
-   alts:[]},
+   alts:[],
+   travel:[
+    {type:"fly",airline:"Norwegian",ref:"ZK2PVU",flight:"DY1403",fromCode:"NCE",fromCity:"Nice",toCode:"OSL",toCity:"Oslo",date:"20. juli",dep:"10:35",seats:"8D, 8E, 8F, 9E, 9F"},
+    {type:"bil",firma:"Sixt",ref:"9735511393",note:"Lever leiebilen på Nice lufthavn, Terminal 2, før innsjekk. Booket retur er seneste kl. 11:00, men lever tidlig nok til avgang 10:35.",url:"https://www.sixt.no/account/#/manage-my-booking-info"}
+   ]},
 ];
 
 /* --- base --- */
@@ -1223,3 +1234,44 @@ const PRAKTISK = [
     "Lommetyver forekommer på tog og i folkemengder. Hold øye med verdisaker, og la pass ligge i safe når det ikke trengs.",
     "Ta med eget strandhåndkle; mange strandklubber tar betalt for utleie."]},
 ];
+
+/* --- transport: tog & parkering per dag (Reise-siden) --- */
+const TRANSPORT = {
+  intro:"Turen er bil-basert de fleste dagene. Lørdag er den store togdagen; ellers leiebil, ferge og båt. Kystlinjen er TER (regionaltog): ingen setereservasjon, barn 4–11 år −50 %, under 4 gratis. Kjøp på SNCF Connect eller automat.",
+  days:[
+    {n:1,day:"Man",date:"13. juli",mode:"Leiebil",icon:"directions_car",
+     tickets:[],
+     parking:[{name:"Ingen parkering å ordne",note:"Hent leiebil på Nice-flyplassen og kjør til basen i Vallauris."}]},
+    {n:2,day:"Tir",date:"14. juli",mode:"Bil + ferge",icon:"directions_boat",
+     tickets:[{t:"Lérins-ferge (Sainte-Marguerite) t/r",status:"booket"}],
+     parking:[
+       {name:"P Laubeuf, Cannes",note:"For Lérins-fergen. Verifiser åpen og plass tidlig morgen."},
+       {name:"P Gare/Ferrage eller P République (kveld)",warn:true,note:"14. juli er sjøfront-garasjene (P Palais m.fl.) stengt/innelåst 19:30–24. Verifiser at disse er åpne på nasjonaldagen."}
+     ]},
+    {n:3,day:"Ons",date:"15. juli",mode:"Bil + båt",icon:"directions_boat",
+     tickets:[{t:"Pass Découverte / Bateaux Verts",status:"på stedet",note:"Kjøpes på kiosken i Sainte-Maxime, ikke tog."}],
+     parking:[{name:"«La Fourmi» (gratis), RN98 Sainte-Maxime",warn:true,note:"Verifiser at gratis-plassen fortsatt finnes i 2026. Kom tidlig i juli."}]},
+    {n:4,day:"Tor",date:"16. juli",mode:"Bil",icon:"directions_car",
+     tickets:[],
+     parking:[{name:"Grasse gamleby",warn:true,note:"Ingen navngitt i planen — velg og verifiser en garasje, f.eks. Parking Honoré Cresp eller Notre-Dame-des-Fleurs."}]},
+    {n:5,day:"Fre",date:"17. juli",mode:"Bil",icon:"directions_car",
+     tickets:[],
+     parking:[
+       {name:"Èze-porten",warn:true,note:"Fylles 09:30–10. Ingen booking — vær der før. Verifiser at plassen er åpen."},
+       {name:"P Port Lympia, Nice",note:"Rett ved Chez Pipo. Verifiser plass."}
+     ]},
+    {n:6,day:"Lør",date:"18. juli",mode:"Tog hele dagen",icon:"train",
+     tickets:[
+       {t:"Golfe-Juan-Vallauris → Monaco-Monte-Carlo (~1t)",status:"kjøp"},
+       {t:"Monaco → Menton (10 min)",status:"kjøp"},
+       {t:"Menton → Golfe-Juan/Cannes, retur (~20:45, ~1t20)",status:"kjøp",note:"Sjekk siste tog vestover når dere booker middag."}
+     ],
+     parking:[{name:"Golfe-Juan-Vallauris stasjon",note:"Bilen står her hele dagen. Verifiser at det finnes dagsparkering ved stasjonen."}]},
+    {n:7,day:"Søn",date:"19. juli",mode:"Tog eller bil",icon:"train",
+     tickets:[{t:"Golfe-Juan → Antibes (12 min) t/r",status:"valgfritt",note:"Alternativet er å kjøre."}],
+     parking:[{name:"P Pré-aux-Pêcheurs, Antibes",note:"Kun hvis dere kjører i stedet for tog."}]},
+    {n:8,day:"Man",date:"20. juli",mode:"Bil → flyplass",icon:"flight_takeoff",
+     tickets:[],
+     parking:[{name:"Ingen parkering å ordne",note:"Avreise fra Nice kl. 10:30. Evt. siste stopp på Marché Forville før dere kjører."}]}
+  ]
+};

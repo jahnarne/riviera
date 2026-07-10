@@ -10,14 +10,15 @@ Statisk side, ingen byggesteg. Designsystemet **«Azure & Earth»** (fra Stitch-
 | `programmet.html` | `renderProgram()` | Hele 8-dagers reiseruten som tidslinje |
 | `dag-1.html` … `dag-8.html` | `renderDay(n)` | Dagsside: hero, «Dagens rute»-tidslinje, kart, bento severdigheter/spisesteder, dagens tips, alternativer |
 | `sted.html#<id>` | `renderPlace()` | Detaljside per severdighet/restaurant: hero, galleri, beskrivelse, tips, praktisk, kart, «Naviger»/«Kilde» |
+| `reise.html` | `renderReise()` | Transport: togbilletter/ferger og parkering (å verifisere) per dag |
 | `praktisk.html` | `renderPraktisk()` | Base- og arkiv-kort + bestillingssjekkliste (huskes lokalt) + praktisk info |
-| `arkiv.html` | (selvstendig) | Den opprinnelige research-siden = «Oppdag». Egne inline-stiler |
+| `arkiv.html` | (selvstendig) | Den opprinnelige research-siden, nås via arkiv-kortet på praktisk-siden. Egne inline-stiler |
 
-Fast bunn-navigasjon på alle guide-sider: **Hjem** → `index.html`, **Plan** → `programmet.html`, **Oppdag** → `arkiv.html`, **Info** → `praktisk.html`.
+Fast bunn-navigasjon på alle guide-sider: **Hjem** → `index.html`, **Plan** → `programmet.html`, **Reise** → `reise.html`, **Info** → `praktisk.html`.
 
 ## Delte filer
-- `data.js` — all data (severdigheter, mat, dagsturer, `WEEK`-ukesplan med per-dag kuratering `hero`/`sights`/`food`/`alts`/`plan`, koordinater, bilder, sjekkliste, praktisk info)
-- `guide.js` — delt logikk + alle renderere (`topBar`/`bottomNav`, `renderHome/Program/Day/Place/Praktisk`, kart, SVG-scener)
+- `data.js` — all data (severdigheter, mat, dagsturer, `WEEK`-ukesplan med per-dag kuratering `hero`/`sights`/`food`/`alts`/`plan`, koordinater, bilder, sjekkliste, praktisk info, `TRANSPORT` for reise-siden)
+- `guide.js` — delt logikk + alle renderere (`topBar`/`bottomNav`, `renderHome/Program/Day/Place/Reise/Praktisk`, kart, SVG-scener)
 - `ds.js` — Tailwind-konfig (design-tokens); lastes etter Tailwind-CDN-taggen på hver side
 - `style.css` — tilleggslag over Tailwind (ikoner, foto-overlay, kartpins, prikkelinje)
 
