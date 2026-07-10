@@ -138,19 +138,19 @@ function scene(zone, seed, pal, bgGlyph){
 
 const COVER_SVG = `
 <svg viewBox="0 0 340 300" xmlns="http://www.w3.org/2000/svg">
-  <defs><linearGradient id="cs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdf6cf"/><stop offset="1" stop-color="#cfe8a6"/></linearGradient></defs>
-  <circle cx="170" cy="140" r="120" fill="url(#cs)"/><circle cx="245" cy="78" r="26" fill="#fff6cf" opacity=".9"/>
-  <path d="M30,200 Q110,150 190,196 T330,188 V300 H30 Z" fill="#7cc0a6"/>
-  <path d="M10,230 Q120,188 240,232 T350,224 V300 H10 Z" fill="#3f8f86"/>
-  <path d="M0,262 Q120,244 240,264 T340,258 V300 H0 Z" fill="#2c6b6e"/>
-  <g transform="translate(150,120) rotate(-12)"><rect x="-26" y="-34" width="52" height="74" rx="7" fill="#2f7a6e"/>
-   <rect x="-26" y="-34" width="52" height="74" rx="7" fill="none" stroke="#1f5b52" stroke-width="2"/>
-   <circle cx="0" cy="-4" r="15" fill="#cfe89a"/>
-   <path d="M-15,-4 H15 M0,-19 V11 M-10,-13 Q0,-4 -10,5 M10,-13 Q0,-4 10,5" stroke="#2f7a6e" stroke-width="1.4" fill="none"/>
-   <rect x="-20" y="22" width="40" height="8" rx="2" fill="#f4d35e"/></g>
-  <g stroke="#3f8f86" stroke-width="2" stroke-dasharray="3 6" fill="none" opacity=".7"><path d="M70,90 Q150,40 250,86"/></g>
-  <g transform="translate(74,86)"><rect x="-16" y="-14" width="32" height="28" rx="3" fill="#fbf9f0" stroke="#3f8f86" stroke-width="2"/>
-   <path d="M-13,8 L-3,-4 L4,4 L9,-2 L13,6 Z" fill="#7cc0a6"/><circle cx="6" cy="-7" r="3" fill="#f4d35e"/></g>
+  <defs><linearGradient id="cs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff5ec"/><stop offset="1" stop-color="#f6d8b6"/></linearGradient></defs>
+  <circle cx="170" cy="140" r="120" fill="url(#cs)"/><circle cx="245" cy="78" r="26" fill="#fde68a" opacity=".95"/>
+  <path d="M30,200 Q110,150 190,196 T330,188 V300 H30 Z" fill="#7fb2cf"/>
+  <path d="M10,230 Q120,188 240,232 T350,224 V300 H10 Z" fill="#3f7aa0"/>
+  <path d="M0,262 Q120,244 240,264 T340,258 V300 H0 Z" fill="#0c4a6e"/>
+  <g transform="translate(150,120) rotate(-12)"><rect x="-26" y="-34" width="52" height="74" rx="7" fill="#c2620f"/>
+   <rect x="-26" y="-34" width="52" height="74" rx="7" fill="none" stroke="#8d4b00" stroke-width="2"/>
+   <circle cx="0" cy="-4" r="15" fill="#fde68a"/>
+   <path d="M-15,-4 H15 M0,-19 V11 M-10,-13 Q0,-4 -10,5 M10,-13 Q0,-4 10,5" stroke="#c2620f" stroke-width="1.4" fill="none"/>
+   <rect x="-20" y="22" width="40" height="8" rx="2" fill="#2f6388"/></g>
+  <g stroke="#c2620f" stroke-width="2" stroke-dasharray="3 6" fill="none" opacity=".65"><path d="M70,90 Q150,40 250,86"/></g>
+  <g transform="translate(74,86)"><rect x="-16" y="-14" width="32" height="28" rx="3" fill="#fffaf4" stroke="#2f6388" stroke-width="2"/>
+   <path d="M-13,8 L-3,-4 L4,4 L9,-2 L13,6 Z" fill="#7fb2cf"/><circle cx="6" cy="-7" r="3" fill="#fde68a"/></g>
 </svg>`;
 
 /* ---------------- KART (Leaflet + OpenStreetMap) ---------------- */
@@ -171,7 +171,7 @@ async function geocode(item){
   saveGeo();
   return geo[item.n];
 }
-function pinColor(x){ return x.cat!=="mat" ? "#1d7874" : (isIce(x) ? "#b5559e" : "#d98b3a"); }
+function pinColor(x){ return x.cat!=="mat" ? "#2f6388" : (isIce(x) ? "#b5559e" : "#c2620f"); }
 function pinEmoji(x){ return x.cat!=="mat" ? "📍" : (isIce(x) ? "🍦" : "🍴"); }
 function markerIcon(x){
   return L.divIcon({className:"", html:`<div class="mpin" style="background:${pinColor(x)}">${pinEmoji(x)}</div>`,
@@ -179,7 +179,7 @@ function markerIcon(x){
 }
 function homeMarker(map){
   if(!map||typeof L==="undefined") return;
-  const ic=L.divIcon({className:"", html:`<div class="mpin" style="background:#1f3d2f;font-size:15px">🏠</div>`, iconSize:[31,31], iconAnchor:[15,15], popupAnchor:[0,-14]});
+  const ic=L.divIcon({className:"", html:`<div class="mpin" style="background:#0c4a6e;font-size:15px">🏠</div>`, iconSize:[31,31], iconAnchor:[15,15], popupAnchor:[0,-14]});
   L.marker(HOME.ll,{icon:ic, zIndexOffset:1000}).addTo(map).bindPopup(`🏠 <b>${HOME.name}</b><br>${HOME.addr}`);
 }
 let _daymap=null;
@@ -303,7 +303,7 @@ function renderDay(n){
 
       ${stops.length?`<section class="sec"><div class="sec-title">Kart over dagen</div>
         <div id="daymap"></div>
-        <div class="maplegend"><span><i class="lgdot" style="background:#1d7874"></i>📍 Severdighet</span><span><i class="lgdot" style="background:#d98b3a"></i>🍴 Spisested</span><span><i class="lgdot" style="background:#b5559e"></i>🍦 Iskrem</span><span><i class="lgdot" style="background:#1f3d2f"></i>🏠 Base</span></div>
+        <div class="maplegend"><span><i class="lgdot" style="background:#2f6388"></i>📍 Severdighet</span><span><i class="lgdot" style="background:#c2620f"></i>🍴 Spisested</span><span><i class="lgdot" style="background:#b5559e"></i>🍦 Iskrem</span><span><i class="lgdot" style="background:#0c4a6e"></i>🏠 Base</span></div>
         <p class="muted" style="font-size:11px;margin-top:6px">Pins er forhåndsplassert (noen omtrentlige). Kartflisene krever nett.</p></section>`:''}
 
       ${sights.length?`<section class="sec"><div class="sec-title">Severdigheter &amp; opplevelser <span class="sec-n">${sights.length}</span></div>

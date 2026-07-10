@@ -1,16 +1,19 @@
-/* Rivieraen 2026 — delt stil (uttrekk fra opprinnelig index.html) */
+/* Rivieraen 2026 — delt stil. Designsystem «Azure & Earth» (French Riviera Planner, Stitch) */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Manrope:wght@400;500;600;700;800&display=swap');
   :root{
-    --cream:#f7f4e9; --cream2:#fbf9f0;
-    --green:#cfe89a; --green-soft:#e6f2c6; --green-deep:#b7da78;
-    --ink:#21372a; --ink-soft:#4d6152; --line:#e4ded0;
-    --teal:#1d7874; --rust:#b5402a; --amber:#c98a16;
-    --shadow:0 10px 30px rgba(33,55,42,.10);
-    --serif:Georgia,'Times New Roman',serif;
-    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    /* Côte d'Azur: ivory-flate, terrakotta primær, middelhavsblå sekundær, gyllen tertiær */
+    --cream:#fff8f5; --cream2:#ffffff;
+    --green:#c2620f; --green-soft:#fbe7d2; --green-deep:#9a4e08;   /* «green» beholdt som navn = primær terrakotta */
+    --gold:#e9b949; --gold-soft:#fbe6c8;
+    --ink:#231a13; --ink-soft:#6b5647; --line:#e6d8c8;
+    --teal:#2f6388; --blue-deep:#0c4a6e; --rust:#b45309; --amber:#c98a16;
+    --shadow:0 10px 30px rgba(180,83,9,.12);
+    --serif:'Libre Caslon Text',Georgia,'Times New Roman',serif;
+    --sans:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0}
-  body{font-family:var(--sans); background:#dce9bf; color:var(--ink); display:flex; justify-content:center; min-height:100vh}
+  body{font-family:var(--sans); background:#eadfd2; color:var(--ink); display:flex; justify-content:center; min-height:100vh}
   #app{width:100%; max-width:460px; background:var(--cream); min-height:100vh; position:relative; overflow:hidden; box-shadow:0 0 60px rgba(0,0,0,.12)}
   .screen{display:none; flex-direction:column; min-height:100vh; padding-bottom:80px}
   .screen.active{display:flex}
@@ -89,17 +92,17 @@
   .d-fav{right:16px; font-size:19px}
   .d-sheet{background:var(--cream); border-radius:26px 26px 0 0; margin-top:-26px; position:relative; padding:22px 20px 40px; z-index:2}
   .d-tagrow{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px}
-  .tag{font-size:11.5px; font-weight:700; padding:5px 10px; border-radius:999px; background:var(--green-soft); color:#3b5a1e}
-  .tag.fresh{background:#d7eef0; color:#155e5b}
+  .tag{font-size:11px; font-weight:600; letter-spacing:.04em; padding:5px 11px; border-radius:999px; background:var(--gold-soft); color:var(--blue-deep)}
+  .tag.fresh{background:#dbe8f0; color:#1c4c6b}
   .tag.warn{background:#fbe7bd; color:#8a5a08}
   .d-title h1{font-size:25px; letter-spacing:-.3px}
   .d-loc{display:flex; align-items:center; gap:6px; color:var(--ink-soft); font-size:13.5px; margin:8px 0 4px}
   .d-block{margin-top:18px}
   .d-block h3{font-family:var(--sans); font-weight:800; text-transform:uppercase; letter-spacing:.4px; color:var(--teal); margin-bottom:6px; font-size:12px}
-  .d-block p{margin:0; font-size:14.5px; line-height:1.6; color:#33433a}
+  .d-block p{margin:0; font-size:14.5px; line-height:1.6; color:#4a3a2c}
   .d-actions{display:flex; gap:10px; margin-top:22px}
-  .d-src{flex:1; display:flex; align-items:center; justify-content:center; gap:7px; text-decoration:none; background:var(--green); color:var(--ink); font-family:var(--serif); font-weight:700; font-size:15px; padding:15px 10px; border-radius:14px; box-shadow:var(--shadow)}
-  .d-src.light{background:var(--cream2); border:1px solid var(--line)}
+  .d-src{flex:1; display:flex; align-items:center; justify-content:center; gap:7px; text-decoration:none; background:var(--green); color:#fff; font-family:var(--sans); font-weight:700; font-size:14px; letter-spacing:.02em; padding:14px 10px; border-radius:999px; box-shadow:var(--shadow)}
+  .d-src.light{background:transparent; color:var(--blue-deep); border:1.5px solid var(--blue-deep); box-shadow:none}
   .kvrow{display:flex; gap:10px; flex-wrap:wrap; margin-top:6px}
   .kv{flex:1 1 calc(50% - 5px); background:var(--cream2); border:1px solid var(--line); border-radius:13px; padding:11px 12px}
   .kv .k{font-size:10.5px; text-transform:uppercase; letter-spacing:.4px; color:var(--ink-soft); font-weight:700}
@@ -150,10 +153,10 @@
 
   /* tidsskjema */
   .tl{margin-top:4px}
-  .tlrow{display:flex; gap:10px; padding:6px 0; border-bottom:1px dashed var(--line)}
+  .tlrow{display:flex; gap:10px; padding:8px 0; border-bottom:1px dotted var(--line)}
   .tlrow:last-child{border-bottom:none}
-  .tlt{flex:0 0 86px; font-weight:700; color:var(--teal); font-size:12.5px}
-  .tld{flex:1; font-size:13.5px; line-height:1.45; color:#33433a}
+  .tlt{flex:0 0 86px; font-weight:700; color:var(--teal); font-size:12.5px; letter-spacing:.02em}
+  .tld{flex:1; font-size:13.5px; line-height:1.45; color:#4a3a2c}
   .hidden{display:none!important}
   .footer-note{padding:18px 22px 30px; color:var(--ink-soft); font-size:12px; line-height:1.5; text-align:center}
 
@@ -190,7 +193,8 @@
 .d-back{ text-decoration:none; color:var(--ink); line-height:1 }
 
 /* ---- FORSIDE ---- */
-.home-cover{ background:radial-gradient(120% 80% at 50% 0%, #fbf9ef 0%, #f1ecda 55%, #e7f0c9 100%); padding-top:8px }
+.home-cover{ background:radial-gradient(120% 80% at 50% 0%, #fff8f5 0%, #fdeede 52%, #f7e0c9 100%); padding-top:8px }
+.home-cover .cover-copy h1{ letter-spacing:.01em }
 .home-cover .cover-art{ padding:22px 24px 0 }
 .home-cover .cover-copy{ padding:6px 24px 24px }
 .home-cover .cover-copy p{ margin:12px 0 0 }
@@ -205,12 +209,12 @@
 .daycard-note{ font-size:12.5px; line-height:1.45; color:var(--ink-soft); margin:7px 0 0 }
 .daycard-meta{ font-size:11.5px; color:var(--teal); font-weight:700; margin-top:8px }
 .day-head{ display:flex; align-items:center; gap:8px; flex-wrap:wrap }
-.dnum{ font-family:var(--serif); font-weight:700; font-size:13px; background:var(--green-deep); color:#22351f; padding:3px 9px; border-radius:999px }
-.ddate{ font-size:12.5px; color:var(--ink-soft); font-weight:600 }
-.dtag{ font-size:11px; font-weight:700; background:var(--green-soft); color:#3b5a1e; padding:3px 9px; border-radius:999px }
+.dnum{ font-family:var(--sans); font-weight:700; font-size:12px; letter-spacing:.03em; background:var(--green); color:#fff; padding:4px 10px; border-radius:999px }
+.ddate{ font-size:12px; color:var(--ink-soft); font-weight:600; letter-spacing:.03em; text-transform:uppercase }
+.dtag{ font-size:11px; font-weight:700; letter-spacing:.04em; background:var(--gold-soft); color:var(--blue-deep); padding:4px 10px; border-radius:999px }
 .home-links{ display:flex; flex-direction:column; gap:10px; padding:16px 16px 6px }
-.btn2{ display:block; text-align:center; text-decoration:none; background:var(--green); color:var(--ink); font-family:var(--serif); font-weight:700; font-size:16px; padding:15px; border-radius:14px; box-shadow:var(--shadow) }
-.btn2.light{ background:var(--cream2); border:1px solid var(--line) }
+.btn2{ display:block; text-align:center; text-decoration:none; background:var(--green); color:#fff; font-family:var(--sans); font-weight:700; font-size:15px; letter-spacing:.02em; padding:16px; border-radius:999px; box-shadow:var(--shadow) }
+.btn2.light{ background:transparent; color:var(--blue-deep); border:1.5px solid var(--blue-deep); box-shadow:none }
 .btn2:active{ transform:translateY(1px) }
 .foot{ text-align:center; font-size:12px; color:var(--ink-soft); padding:20px 20px 10px }
 .foot a{ color:var(--teal) }
@@ -219,18 +223,18 @@
 .day-hero{ position:relative; height:250px; overflow:hidden }
 .day-hero svg{ width:100%; height:100%; display:block }
 .day-hero .badge{ top:auto; bottom:120px }
-.day-hero-cap{ position:absolute; left:0; right:0; bottom:0; padding:34px 18px 16px; background:linear-gradient(to top, rgba(20,32,24,.82) 0%, rgba(20,32,24,.5) 45%, rgba(20,32,24,0) 100%); color:#fff }
-.day-hero-cap .ddate{ color:#e9f0dd }
-.day-hero-cap .dnum{ background:var(--green); color:#22351f }
-.day-title{ font-size:24px; letter-spacing:-.3px; margin:8px 0 4px; color:#fff }
-.day-count{ font-size:12px; color:#dfe8d3; font-weight:600 }
+.day-hero-cap{ position:absolute; left:0; right:0; bottom:0; padding:36px 18px 16px; background:linear-gradient(to top, rgba(12,40,58,.85) 0%, rgba(12,40,58,.5) 45%, rgba(12,40,58,0) 100%); color:#fff }
+.day-hero-cap .ddate{ color:#e7ddd1 }
+.day-hero-cap .dnum{ background:var(--green); color:#fff }
+.day-title{ font-size:26px; letter-spacing:.005em; margin:8px 0 4px; color:#fff }
+.day-count{ font-size:11px; color:#e7ddd1; font-weight:600; letter-spacing:.06em; text-transform:uppercase }
 .day-body{ padding:16px 16px 8px }
-.dnote.big{ font-size:14.5px; line-height:1.55; color:#33433a; background:var(--green-soft); border:1px solid var(--green-deep); border-radius:14px; padding:13px 14px; margin:0 0 4px }
+.dnote.big{ font-size:14.5px; line-height:1.55; color:#4a3a2c; background:var(--gold-soft); border:1px solid rgba(154,78,8,.28); border-radius:14px; padding:14px 15px; margin:0 0 4px }
 
 /* ---- SEKSJONER ---- */
 .sec{ margin-top:22px }
 .sec-title{ font-family:var(--serif); font-weight:700; font-size:19px; display:flex; align-items:center; gap:8px; margin-bottom:10px }
-.sec-n{ font-family:var(--sans); font-size:12px; font-weight:700; color:var(--teal); background:var(--green-soft); padding:2px 9px; border-radius:999px }
+.sec-n{ font-family:var(--sans); font-size:12px; font-weight:700; color:var(--blue-deep); background:var(--gold-soft); padding:2px 9px; border-radius:999px }
 .card-tl{ background:var(--cream2); border:1px solid var(--line); border-radius:16px; padding:8px 15px; box-shadow:var(--shadow) }
 #daymap{ height:250px; border-radius:16px; overflow:hidden; border:1px solid var(--line); background:#e8eee6 }
 
@@ -260,8 +264,8 @@
 
 /* ---- DAG-NAVIGASJON ---- */
 .daynav{ display:flex; align-items:stretch; gap:10px; margin-top:30px }
-.daynav-btn{ flex:1; display:flex; align-items:center; justify-content:center; text-align:center; text-decoration:none; background:var(--green); color:var(--ink); font-family:var(--serif); font-weight:700; font-size:14.5px; padding:14px 8px; border-radius:14px; box-shadow:var(--shadow) }
-.daynav-home{ flex:0 0 auto; display:flex; align-items:center; justify-content:center; width:52px; text-decoration:none; background:var(--cream2); border:1px solid var(--line); border-radius:14px; font-size:20px; color:var(--ink) }
+.daynav-btn{ flex:1; display:flex; align-items:center; justify-content:center; text-align:center; text-decoration:none; background:var(--green); color:#fff; font-family:var(--sans); font-weight:700; font-size:14px; letter-spacing:.02em; padding:15px 8px; border-radius:999px; box-shadow:var(--shadow) }
+.daynav-home{ flex:0 0 auto; display:flex; align-items:center; justify-content:center; width:52px; text-decoration:none; background:var(--cream2); border:1px solid var(--line); border-radius:999px; font-size:20px; color:var(--blue-deep) }
 .daynav-btn:active,.daynav-home:active{ transform:translateY(1px) }
 
 /* ---- PRAKTISK-SIDE ---- */
