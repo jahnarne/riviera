@@ -187,6 +187,94 @@ function bottomNav(active){
 function shell(inner, active){
   document.getElementById("app").innerHTML = topBar() + inner + bottomNav(active);
   hydrate(document.getElementById("app"));
+  hydrateWeather(document.getElementById("app"));
+}
+
+/* ---------------- VÆRVARSEL (YR / MET Norway) ---------------- */
+let wxCache=(function(){ try{ return JSON.parse(localStorage.getItem("rivwx")||"{}"); }catch(e){ return {}; } })();
+function saveWxCache(){ try{ localStorage.setItem("rivwx", JSON.stringify(wxCache)); }catch(e){} }
+async function wxFetch(lat,lon){
+  const key=lat.toFixed(2)+","+lon.toFixed(2);
+  const c=wxCache[key];
+  if(c && (Date.now()-c.ts) < 3*3600*1000) return c.data;   // fersk nok (3t)
+  try{
+    const r=await fetch(`https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${lat.toFixed(3)}&lon=${lon.toFixed(3)}`);
+    if(!r.ok) return c?c.data:null;
+    const j=await r.json();
+    const data=(j.properties&&j.properties.timeseries)||[];
+    wxCache[key]={ts:Date.now(),data}; saveWxCache();
+    return data;
+  }catch(e){ return c?c.data:null; }
+}
+function wxForDate(series,iso){
+  if(!series||!series.length) return null;
+  const day=series.filter(e=>e.time.slice(0,10)===iso);
+  if(!day.length) return null;
+  let tmax=-99,tmin=99,precip=0,sym=null,temp=null,best=1e9;
+  day.forEach(e=>{
+    const det=e.data.instant&&e.data.instant.details;
+    const t=det&&det.air_temperature;
+    if(typeof t==="number"){ tmax=Math.max(tmax,t); tmin=Math.min(tmin,t); }
+    const n6=e.data.next_6_hours,n1=e.data.next_1_hours;
+    const p=(n6&&n6.details&&n6.details.precipitation_amount)||(n1&&n1.details&&n1.details.precipitation_amount)||0;
+    precip+=p;
+    const hour=parseInt(e.time.slice(11,13));
+    const s=(n6&&n6.summary&&n6.summary.symbol_code)||(n1&&n1.summary&&n1.summary.symbol_code);
+    if(s && Math.abs(hour-13)<best){ best=Math.abs(hour-13); sym=s; temp=t; }
+  });
+  if(tmax===-99) return null;
+  return {tmax:Math.round(tmax),tmin:Math.round(tmin),temp:Math.round(temp!=null?temp:tmax),symbol:sym,precip:Math.round(precip*10)/10};
+}
+function wxMeta(code){
+  const c=(code||"").replace(/_(day|night|polartwilight)$/,"");
+  if(c.indexOf("clearsky")>=0) return ["sunny","Strålende sol"];
+  if(c.indexOf("fair")>=0) return ["clear_day","Lettskyet"];
+  if(c.indexOf("partlycloudy")>=0) return ["partly_cloudy_day","Delvis skyet"];
+  if(c.indexOf("cloudy")>=0) return ["cloud","Skyet"];
+  if(c.indexOf("fog")>=0) return ["foggy","Tåke"];
+  if(c.indexOf("thunder")>=0) return ["thunderstorm","Torden"];
+  if(c.indexOf("sleet")>=0) return ["weather_mix","Sludd"];
+  if(c.indexOf("snow")>=0) return ["weather_snowy","Snø"];
+  if(c.indexOf("shower")>=0) return ["rainy","Regnbyger"];
+  if(c.indexOf("rain")>=0) return ["rainy","Regn"];
+  return ["thermostat", c||"Vær"];
+}
+function weatherCard(place,w){
+  const [ic,label]=wxMeta(w.symbol);
+  return `<div class="rounded-xl bg-secondary-container/30 border border-secondary-container/50 p-6">
+    <div class="flex justify-between items-start mb-4">
+      <div><span class="text-on-secondary-container font-label-sm text-label-sm uppercase tracking-widest block mb-2">Værvarsel</span>
+        <h4 class="font-headline-md text-headline-md text-on-surface">${place}, Frankrike</h4></div>
+      <span class="material-symbols-outlined text-4xl text-secondary" style="font-variation-settings:'FILL' 1">${ic}</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <span class="text-4xl font-headline-md">${w.temp}°C</span>
+      <div class="h-10 w-px bg-secondary/20"></div>
+      <div><p class="font-label-md text-on-surface leading-tight">${label}</p>
+        <p class="text-label-sm text-on-surface-variant">Maks ${w.tmax}° / min ${w.tmin}°${w.precip?` · ${w.precip} mm`:''}</p></div>
+    </div>
+  </div>`;
+}
+function weatherChip(w){
+  const [ic,label]=wxMeta(w.symbol);
+  return `<span class="inline-flex items-center gap-1.5 text-label-sm text-on-surface-variant"><span class="material-symbols-outlined text-[17px] text-secondary" style="font-variation-settings:'FILL' 1">${ic}</span>${label} · ${w.tmax}° / ${w.tmin}°</span>`;
+}
+async function hydrateWeather(root){
+  const els=[...(root||document).querySelectorAll('[data-wx]:not([data-wxdone])')];
+  for(const el of els){
+    el.setAttribute("data-wxdone","1");
+    const lat=parseFloat(el.dataset.lat), lon=parseFloat(el.dataset.lon), iso=el.dataset.iso, place=el.dataset.place||"", mode=el.dataset.wx;
+    if(isNaN(lat)||isNaN(lon)||!iso) continue;
+    const series=await wxFetch(lat,lon);
+    const w=wxForDate(series,iso);
+    if(!w){ el.remove(); continue; }
+    el.innerHTML = mode==="chip"?weatherChip(w):weatherCard(place,w);
+  }
+}
+function isoForDay(d){ return `2026-07-${String(parseInt(d.date)).padStart(2,"0")}`; }
+function isoToday(){ const t=new Date(); return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`; }
+function wxSlot(mode,lat,lon,iso,place,cls){
+  return `<div class="${cls||''}" data-wx="${mode}" data-lat="${lat}" data-lon="${lon}" data-iso="${iso}" data-place="${place||''}"></div>`;
 }
 
 /* ---------------- DAG-INDEKS ETTER DATO ---------------- */
@@ -224,6 +312,19 @@ function altCard(a){
       <p class="font-label-sm text-label-sm text-secondary font-bold mt-0.5">${ZONES[x.z].name}${x.cat==='mat'?' · '+x.p:''}</p>
       <p class="text-sm text-on-surface-variant mt-1 leading-snug">${why}</p></div></a>`;
 }
+const PLAN_ABBR=new Set(["evt","kl","ca","f.eks","bl.a","m.fl","min","maks","nr","osv","dvs","pga","obs","t"]);
+function splitStep(x){
+  let from=0, idx=-1;
+  while(true){
+    const p=x.indexOf(". ", from);
+    if(p<0) break;
+    const before=x.slice(0,p);
+    const lastWord=(before.split(/[\s(]/).pop()||"").toLowerCase();
+    if(lastWord.length>=3 && !PLAN_ABBR.has(lastWord)){ idx=p; break; }
+    from=p+2;
+  }
+  return idx<0 ? [x,""] : [x.slice(0,idx), x.slice(idx+2)];
+}
 function planIcon(text){
   const t=(text||"").toLowerCase();
   if(/ferge|båt|boat/.test(t)) return 'directions_boat';
@@ -242,15 +343,15 @@ function planIcon(text){
 /* ================= FORSIDE ================= */
 function renderHome(){
   const di=tripDayIndex(), day=WEEK[di-1];
-  const hero=day.hero?byName[day.hero]:null;
   const FEATURED=["Saint-Tropez gamleby & La Ponche","Monaco – Le Rocher & akvariet","Èze village","Vieux Nice + Cours Saleya"]
     .map(n=>byName[n]).filter(Boolean);
+  const hero=(day.hero?byName[day.hero]:null) || FEATURED[0] || null;
   const preview=WEEK;
 
   const inner=`<main class="pb-28">
     <!-- HERO -->
     <section class="relative h-[70vh] min-h-[520px] w-full overflow-hidden">
-      ${heroLayers(hero)}
+      ${hero ? heroLayers(hero) : `<div class="ph-scene absolute inset-0">${scene('cannes',1,null,null)}</div>`}
       <div class="absolute inset-0 z-[2]" style="background:linear-gradient(to bottom, rgba(35,26,19,.35) 0%, rgba(35,26,19,0) 38%, rgba(35,26,19,.72) 100%)"></div>
       <div class="absolute bottom-0 inset-x-0 z-[3] p-margin-mobile max-w-container-max mx-auto">
         <span class="inline-block px-4 py-1 mb-4 bg-terracotta/90 text-white rounded-full font-label-sm text-label-sm uppercase tracking-widest">Sommer 2026</span>
@@ -277,15 +378,7 @@ function renderHome(){
           <p class="text-on-surface-variant mb-5 leading-relaxed">${firstSentence(day.note||day.title)}</p>
           <span class="text-terracotta font-label-md text-label-md flex items-center gap-1">Les mer om dagen ${icon('chevron_right','text-[18px]')}</span>
         </a>
-        <a href="praktisk.html" class="relative overflow-hidden rounded-xl bg-secondary-container/30 p-6 border border-secondary-container/50 block">
-          <div class="flex justify-between items-start mb-5">
-            <div><span class="text-on-secondary-container font-label-sm text-label-sm uppercase tracking-widest block mb-2">Vår base</span>
-              <h3 class="font-headline-md text-headline-md">${HOME.name.replace(/\s*\(.*\)/,'')}</h3></div>
-            <div class="text-on-secondary-container">${icon('home','text-4xl')}</div>
-          </div>
-          <p class="text-on-surface leading-tight font-label-md">${HOME.addr}</p>
-          <p class="text-label-sm text-on-surface-variant mt-1">Praktisk info, sjekkliste og bestillinger →</p>
-        </a>
+        ${wxSlot('card',43.5513,7.0128,isoToday(),'Cannes')}
       </div>
     </section>
 
@@ -304,7 +397,8 @@ function renderHome(){
           ${preview.map((d,i)=>`<a href="dag-${i+1}.html" class="flex gap-6 relative z-10">
             <div class="w-10 h-10 rounded-full ${i+1===di?'bg-terracotta text-white':'bg-white border-2 border-terracotta text-terracotta'} flex items-center justify-center font-label-md flex-shrink-0 shadow-sm">${parseInt(d.date)}</div>
             <div><h5 class="font-headline-md text-[20px] leading-tight mb-1">${d.tag||d.title}</h5>
-              <p class="text-on-surface-variant">${firstSentence(d.note||d.title)}</p></div></a>`).join("")}
+              <p class="text-on-surface-variant">${firstSentence(d.note||d.title)}</p>
+              ${d.wx?wxSlot('chip',d.wx.lat,d.wx.lon,isoForDay(d),'','mt-2'):''}</div></a>`).join("")}
         </div>
         <a href="programmet.html" class="mt-10 text-terracotta font-label-md text-label-md flex items-center gap-2">Se reiseruten med bilder ${icon('arrow_forward','text-[18px]')}</a>
       </div>
@@ -426,11 +520,13 @@ function renderDay(n){
 
   const timeline=(d.plan||[]).map(r=>{
     const i=r.indexOf(" — "); const t=i>0?r.slice(0,i):""; const x=i>0?r.slice(i+3):r;
+    const [head,desc]=splitStep(x);
     return `<div class="relative flex gap-5 items-start">
       <div class="w-9 h-9 rounded-full bg-terracotta text-white flex items-center justify-center shrink-0 z-10 shadow border-2 border-background">${icon(planIcon(x),'text-[18px]')}</div>
       <div class="bg-ivory p-5 rounded-xl shadow-sm border border-sand flex-1">
         ${t?`<span class="font-label-sm text-label-sm text-terracotta block mb-1">${t}</span>`:''}
-        <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">${x}</p></div></div>`;
+        <h4 class="font-headline-md text-[19px] text-on-surface leading-snug mb-1">${head}</h4>
+        ${desc?`<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">${desc}</p>`:''}</div></div>`;
   }).join("");
 
   const inner=`<main class="pb-28">
@@ -448,6 +544,7 @@ function renderDay(n){
     </section>
 
     <div class="px-margin-mobile max-w-container-max mx-auto">
+      ${d.wx?`<section class="pt-6">${wxSlot('card',d.wx.lat,d.wx.lon,isoForDay(d),d.wx.place)}</section>`:''}
       ${renderTravel(d)}
       ${timeline?`<section class="py-10">
         <h2 class="font-headline-md text-headline-md text-on-surface-variant mb-8 flex items-center gap-3">${icon('schedule','text-terracotta')} Dagens rute</h2>
