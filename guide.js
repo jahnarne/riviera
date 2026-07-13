@@ -241,9 +241,10 @@ function wxMeta(code){
   if(c.indexOf("rain")>=0) return ["rainy","Regn"];
   return ["thermostat", c||"Vær"];
 }
-function weatherCard(place,w){
+function yrUrl(lat,lon){ return `https://www.yr.no/nb/v%C3%A6rvarsel/daglig-tabell/${lat},${lon}`; }
+function weatherCard(place,w,url){
   const [ic,label]=wxMeta(w.symbol);
-  return `<div class="rounded-xl bg-secondary-container/30 border border-secondary-container/50 p-6">
+  return `<a href="${url}" target="_blank" rel="noopener" class="block no-underline rounded-xl bg-secondary-container/30 border border-secondary-container/50 p-6 hover:border-secondary/60 transition-colors">
     <div class="flex justify-between items-start mb-4">
       <div><span class="text-on-secondary-container font-label-sm text-label-sm uppercase tracking-widest block mb-2">Værvarsel</span>
         <h4 class="font-headline-md text-headline-md text-on-surface">${place}, Frankrike</h4></div>
@@ -255,11 +256,12 @@ function weatherCard(place,w){
       <div><p class="font-label-md text-on-surface leading-tight">${label}</p>
         <p class="text-label-sm text-on-surface-variant">Maks ${w.tmax}° / min ${w.tmin}°${w.precip?` · ${w.precip} mm`:''}</p></div>
     </div>
-  </div>`;
+    <div class="flex items-center gap-1 mt-4 text-label-sm text-secondary"><span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">open_in_new</span>Se varselet på Yr</div>
+  </a>`;
 }
-function weatherChip(w){
+function weatherChip(w,url){
   const [ic,label]=wxMeta(w.symbol);
-  return `<span class="inline-flex items-center gap-1.5 text-label-sm text-on-surface-variant"><span class="material-symbols-outlined text-[17px] text-secondary" style="font-variation-settings:'FILL' 1">${ic}</span>${label} · ${w.tmax}° / ${w.tmin}°</span>`;
+  return `<a href="${url}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-label-sm text-on-surface-variant no-underline hover:text-secondary transition-colors"><span class="material-symbols-outlined text-[17px] text-secondary" style="font-variation-settings:'FILL' 1">${ic}</span>${label} · ${w.tmax}° / ${w.tmin}°<span class="material-symbols-outlined text-[14px]">open_in_new</span></a>`;
 }
 async function hydrateWeather(root){
   const els=[...(root||document).querySelectorAll('[data-wx]:not([data-wxdone])')];
@@ -270,7 +272,8 @@ async function hydrateWeather(root){
     const series=await wxFetch(lat,lon);
     const w=wxForDate(series,iso);
     if(!w){ el.remove(); continue; }
-    el.innerHTML = mode==="chip"?weatherChip(w):weatherCard(place,w);
+    const url=yrUrl(el.dataset.lat,el.dataset.lon);
+    el.innerHTML = mode==="chip"?weatherChip(w,url):weatherCard(place,w,url);
   }
 }
 function isoForDay(d){ return `2026-07-${String(parseInt(d.date)).padStart(2,"0")}`; }

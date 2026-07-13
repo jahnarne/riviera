@@ -771,7 +771,7 @@ const MODULER = [
    why:"Oceanografisk museum → vaktskifte kl. 11:55 → Jardins Saint-Martin (flat) eller nye Jardin Exotique.",
    trans:"Tog ~57 min–1 t.",intensitet:"Middels (trapper på klippen)",kost:"tog ~120–150 € + museum ~73 € + lunsj ~50–60 €",
    mat:"Lunsj Place d'Armes-markedet (Chez Roger socca) · middag tilbake i Cannes.",
-   pair:"Hel dag alene. Kan ta kort Èze-stopp på vei hjem (buss 602), men da blir dagen lang. Vaktskiftet ved Fyrstepalasset kl. 11:55. Kasinoets spillsaler krever pass + dresskode (18+, ~19 €) — plassen og fasaden er gratis. Sjekk siste tog vestover. Bilglade barn: Prinsens bilsamling ved Port Hercule (10 €, 5 € barn).",
+   pair:"Hel dag alene. Kan ta kort Èze-stopp på vei hjem (buss 602), men da blir dagen lang. Vaktskiftet ved Fyrstepalasset kl. 11:55. Kasinoets spillsaler krever pass + dresskode (18+, ~19 €) — plassen og fasaden er gratis. Sjekk siste tog vestover. Bilglade barn: Prinsens bilsamling ved Port Hercule (15 €, 10 € barn).",
    u:"https://musee.oceano.org/en/practical-info/"},
   {z:"monaco",n:"13 · Kornisjene øst: Èze + Villefranche",a:"Tog + buss · TUNG morgen",f:"bekreftet",k:"delvis",
    why:"Tidlig til Èze + Jardin Exotique (FØR kl. 10) → ned til Villefranche: Rue Obscure + rolig bad.",
